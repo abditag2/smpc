@@ -15,5 +15,7 @@ public class Config {
 	//RTT parameters needs to be defined. The following are for the linear distribution
 	public static final int RTTmin = 10;
 	public static final int RTTmax = 20;
-
+	
+	//this parameter is to determine the nodes incoming bandwidth
+	public static final int nodeIncomingBandWidth = 100;
 }

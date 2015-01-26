@@ -1,4 +1,4 @@
-package smpc;
+package smpc.test;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -7,6 +7,8 @@ import org.junit.*;
 
 import smpc.Topology;
 import smpc.Config;
+import smpc.Abstracts.*;
+import smpc.Abstracts.NetworkPacket.PacketType;
 
 public class Tests {
     @Test
@@ -32,6 +34,15 @@ public class Tests {
 			}
 		};
 		assertEquals(arr2, members2);
-		
+    }
+    
+    @Test
+    public void testNodePacketScheduling(){
+    	Node node = new Node(1000, 1);
+    	
+    	NetworkPacket packet1 = new NetworkPacket(0, 100, PacketType.PHASE1);
+    	NetworkPacket packet2 = new NetworkPacket(10, 100, PacketType.PHASE1);
+    	node.recievePacket(networkPacket);
+    	
     }
 }

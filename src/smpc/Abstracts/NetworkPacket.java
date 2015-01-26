@@ -4,18 +4,19 @@ import java.util.Enumeration;
 
 public class NetworkPacket {
 	int startTime;
-	int numberOfRemainingPackets;
+	int totalPacketContent;
+	float numberOfRemainingPackets;
 	
 	PacketType packetType;
 
 	public enum PacketType{
-	    SUNDAY, MONDAY, TUESDAY, WEDNESDAY,
-	    THURSDAY, FRIDAY, SATURDAY 
+	    PHASE1, PHASE2
 	}	
 	
-	public NetworkPacket(int startTime, int numberOfRemainingPackets, PacketType packetType) {
+	public NetworkPacket(int startTime, int totalPacketContent, PacketType packetType) {
 		this.startTime = startTime;
-		this.numberOfRemainingPackets = numberOfRemainingPackets;
+		this.numberOfRemainingPackets = totalPacketContent;
+		this.totalPacketContent = totalPacketContent;
 		this.packetType = packetType;
 	}
 }

@@ -3,9 +3,9 @@ package smpc;
 public class Config {
 
 	//Modify these
-	public static final int nArry = 2;
-	public static final int numberOfLayersTopology = 3;
-	public static final int numberOfnodes = 10;
+	public int nArry;
+	public int numberOfLayersTopology;
+	public int numberOfnodes;
 	
 	//Number of clusters should be n^(layers)-1 so that it would form a complete tree.
 	public int numberOfClusters() {
@@ -13,9 +13,30 @@ public class Config {
 	}	
 
 	//RTT parameters needs to be defined. The following are for the linear distribution
-	public static final int RTTmin = 10;
-	public static final int RTTmax = 20;
+	public int RTTmin;
+	public int RTTmax;
 	
 	//this parameter is to determine the nodes incoming bandwidth
-	public static final int nodeIncomingBandWidth = 100;
+	public int nodeIncomingBandWidth ;
+	
+	//waitingTime for the nodes in each round
+	public int cycleLength;
+	
+	public Config() {
+		this.nArry = 2;
+		this.numberOfLayersTopology = 3;
+		this.numberOfnodes = 10;
+		
+
+		//RTT parameters needs to be defined. The following are for the linear distribution
+		this.RTTmin = 10;
+		this.RTTmax = 20;
+		
+		//this parameter is to determine the nodes incoming bandwidth
+		this.nodeIncomingBandWidth = 100;
+		
+		//waitingTime for the nodes in each round
+		this.cycleLength = 100;
+		
+	}
 }

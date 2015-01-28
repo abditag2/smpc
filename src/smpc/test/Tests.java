@@ -1,8 +1,8 @@
 package smpc.test;
+
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-
 import org.junit.*;
 
 import smpc.Topology;

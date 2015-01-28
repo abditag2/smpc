@@ -1,34 +1,39 @@
 package smpc.Abstracts;
 
-import java.util.LinkedList;
 import smpc.Config;
 
+import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+
 public class Node {
-	
-	
-	int initialContentSize;
-	int ID;
+	public int ID;
+	public boolean honest;
+	public boolean failed;
 	
 	public LinkedList<NetworkPacket> packetsReceived;
-	public LinkedList<NetworkPacket> packetQToBeRecieved;
+	public TreeSet<NetworkPacket> packetQToBeRecieved;
+	
 	
 	private Config config;
-	
-	public Node(int initialContentSize, int ID, Config config) {
-		this.initialContentSize = initialContentSize;
-		this.ID = ID;
 		
-		packetQToBeRecieved = new LinkedList<NetworkPacket>();
+	public Node(int ID, Config config, boolean honest, boolean failed) {
+		this.ID = ID;
+		this.honest = honest;
+		this.failed = failed;
+		
+		packetQToBeRecieved = new TreeSet<NetworkPacket>();
 		packetsReceived = new LinkedList<NetworkPacket>();
 		
 		this.config = config;
 	}
 	
 	public void protocol(){
-		//Here set all the packets that need to be sent out during the next protocol round
+		//This runs in every round. must send all the messages and also take care of all the time related issues.
 	}
 
-	
 	public void recievePacket(NetworkPacket networkPacket) 
 	{
 		packetQToBeRecieved.add(networkPacket);
@@ -38,65 +43,19 @@ public class Node {
 	public void schedlueIncomingPackets(int currentTime, int endOfCycle) {
 		
 		/*
-		 *the goal of this function is to schedule the packets until the end of cycle and
-		 *set the communication flows that are completely recieved. 
+		 *the goal of this function is to schedule the packets until the end of cycle and 
 		 */
-		
-		//initialize the now variable with the cycle start time
-		float now = currentTime;
-
-		while(true) {
-
-			float[] results= findMinStartEndtimesAfterCurrentTime(
-					now, 
-					packetQToBeRecieved);
-			
-			float nextTime = Math.min(results[0], endOfCycle);
-			float countOngoingFlows = results[1];
-			float newRateForEachOngoingFlow = this.config.nodeIncomingBandWidth/countOngoingFlows;
-			float transmittedPacketsInSubCycle = (float) (nextTime - now)/newRateForEachOngoingFlow;
-			
-			for (NetworkPacket packet:packetQToBeRecieved) {				
-				if (now >= packet.startTime){
-					packet.numberOfRemainingPackets = packet.numberOfRemainingPackets - transmittedPacketsInSubCycle;
-					if(packet.numberOfRemainingPackets <= 0)
-					{
-						packetQToBeRecieved.remove(packet);
-						packetsReceived.add(packet);
-					}
-				}
+		while(!packetQToBeRecieved.isEmpty()) {
+			NetworkPacket packet = packetQToBeRecieved.first();
+			if (packet.startTime < endOfCycle) {
+				packetsReceived.add(packet);
+				packetQToBeRecieved.remove(packet);
 			}
-			now = Math.min(nextTime, endOfCycle);
-			if (now > endOfCycle)
+			else {
 				break;
+			}
+				
 		}
    	}
 	
-	public float[] findMinStartEndtimesAfterCurrentTime(
-			float now, 
-			LinkedList<NetworkPacket> packetQToBeRecieved)
-	{
-		float minTime = Float.MAX_VALUE;
-		float minPacket = Float.MAX_VALUE;
-		
-		int countOngoingFlows = 0 ; 
-		for (NetworkPacket packet:packetQToBeRecieved) {
-			//find the minimum number of packets remaining for the nodes in between the flow
-			if (now >= packet.startTime) {
-				countOngoingFlows++;
-				if (minPacket < packet.numberOfRemainingPackets)
-					minPacket = packet.numberOfRemainingPackets;
-			}
-			
-			else if (now <= packet.startTime) {
-				if (minTime > packet.startTime)
-					minTime = packet.startTime;
-			}			
-		}
-		
-		float rate = this.config.nodeIncomingBandWidth;
-		float minTimeForOngoingFlows = minPacket/rate + 1; //+1 is for the division error
-		float nextTime = (float) Math.min(minTime, minTimeForOngoingFlows);
-		return new float[] {nextTime, countOngoingFlows};
-	}
 }

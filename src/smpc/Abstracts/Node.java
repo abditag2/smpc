@@ -31,7 +31,13 @@ public class Node {
 	}
 	
 	public void protocol(){
-		//This runs in every round. must send all the messages and also take care of all the time related issues.
+		/*
+		 * This runs in every round. must send all the messages 
+		 * and also take care of all the time related issues.
+		 */
+		
+		
+		
 	}
 
 	public void recievePacket(NetworkPacket networkPacket) 

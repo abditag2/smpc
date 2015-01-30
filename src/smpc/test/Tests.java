@@ -2,11 +2,16 @@ package smpc.test;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
+import java.util.*;
+
+import javax.lang.model.util.SimpleAnnotationValueVisitor6;
+
 import org.junit.*;
 
+import smpc.Simulator.*;
 import smpc.Topology;
 import smpc.Config;
+import smpc.Simulator;
 import smpc.Abstracts.*;
 import smpc.Abstracts.NetworkPacket.PacketType;
 
@@ -37,12 +42,22 @@ public class Tests {
     }
     
     @Test
-    public void testNodePacketScheduling(){
-    	Node node = new Node(1000, 1);
+    public void testGetFailedNodes(){
+    	Simulator sim = new Simulator(new Config());
+    	sim.initialize();    	
+    	List<Integer> randNumbers = sim.getMRandomNumbersOutOfN(10, 1000);
+    	assert(randNumbers.size() == 10);
+    	for (Integer number:randNumbers) 
+    	{
+    		assert(number < 1000);    	
+    	}
+    }
+    
+    @Test
+    public void testFailedNodeIDs() {
+    	Simulator sim = new Simulator(new Config());    	
+    	ArrayList<FailedNode> failedNodes = sim.getFailedNodes(100000 ,1000, 60);
     	
-    	NetworkPacket packet1 = new NetworkPacket(0, 100, PacketType.PHASE1);
-    	NetworkPacket packet2 = new NetworkPacket(10, 100, PacketType.PHASE1);
-    	node.recievePacket(networkPacket);
-    	
+    	//just manually check this outputs :)
     }
 }

@@ -29,7 +29,10 @@ public class Config {
 
 	// set the failure rate for servers (lifetime in hours)
 	public int failureRate;
-
+	
+	//Recovrytime in number of rounds that it takes to recover
+	public int recoveryTime;
+	
 	public Config() {
 		/*
 		 * set the default value for the parameters here and later can be chagned in the execution
@@ -37,12 +40,14 @@ public class Config {
 		
 		this.nArry = 2;
 		this.numberOfLayersTopology = 3;
-		this.numberOfnodes = 10;
+		this.numberOfnodes = 14;
 		this.RTTmin = 10;
 		this.RTTmax = 20;
 		this.nodeIncomingBandWidth = 100;
 		this.lengthOfRound = 100;
 		this.percentOfCorruptedNodes = 20;
-		this.failureRate = 10000;
+
+		this.failureRate = 1000000;
+		this.recoveryTime = 4;
 	}
 }

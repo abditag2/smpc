@@ -81,19 +81,22 @@ public class Simulator {
 			failedNodes.put(failedNode.ID, failedNode);
 			nodes.get(failedNode.ID).failed = true;
 		}
+		
 		//recover all the failed nodes that have passed the recovery time
-		Set<Integer>  failedNodesSet= failedNodes.keySet();
-		for(Integer key:failedNodesSet) {
-			FailedNode node = failedNodes.get(key);
-			
-			if (node.roundsLeft -1 == 0) {
+		Iterator<Map.Entry<Integer, FailedNode>> failedNodesIterator= failedNodes.entrySet().iterator();
+		while(failedNodesIterator.hasNext()) {
+			Map.Entry<Integer, FailedNode> pair = failedNodesIterator.next();
+			Integer failedNodeID = pair.getKey();
+			FailedNode failedNode = failedNodes.get(failedNodeID);
+			if (failedNode.roundsLeft -1 == 0) {
 				//recover the Node
-				failedNodes.remove(key);
+				failedNodesIterator.remove();
+				this.nodes.get(failedNodeID).failed = false;
 			}
 			else {
 				//reduce the remained time
-				node.roundsLeft = node.roundsLeft - 1 ; 
-				failedNodes.put(key, node);
+				failedNode.roundsLeft = failedNode.roundsLeft - 1 ; 
+				failedNodes.put(failedNodeID, failedNode);
 			}
 		}
 		
@@ -105,12 +108,21 @@ public class Simulator {
 		 */
 		for(int i = 0 ; i< this.config.numberOfClusters(); i++) {
 			ArrayList<Integer> clusterMembers = this.topology.getClusterMembers(i);
+			boolean hasHonestLiveNode = false;
+			System.out.println("cluster Id: " + i);
+			System.out.println("members: "+ clusterMembers.toString());
 			for(Integer memberID:clusterMembers) {
 				Node member = this.nodes.get(memberID);
+
 				if(member.failed == false && member.honest == true) {
 					//if there is at least one honest member that has not failed
+					hasHonestLiveNode = true;
+					System.out.println("good node ID:" + memberID);
 					break;
 				}
+			}
+			if (!hasHonestLiveNode) {		
+				System.out.println("Termination Condition 1");
 				return true;
 			}
 		}

@@ -39,15 +39,15 @@ public class Config {
 		 */
 		
 		this.nArry = 2;
-		this.numberOfLayersTopology = 3;
-		this.numberOfnodes = 14;
+		this.numberOfLayersTopology = 5;
+		this.numberOfnodes = 1000;
 		this.RTTmin = 10;
 		this.RTTmax = 20;
 		this.nodeIncomingBandWidth = 100;
 		this.lengthOfRound = 100;
-		this.percentOfCorruptedNodes = 20;
+		this.percentOfCorruptedNodes = 80;
 
-		this.failureRate = 1000000;
-		this.recoveryTime = 4;
+		this.failureRate = 100;
+		this.recoveryTime = 7;
 	}
 }

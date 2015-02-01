@@ -21,10 +21,7 @@ public class Node {
 	public LinkedList<NetworkPacket> packetsReceived;
 	public TreeSet<NetworkPacket> packetQToBeRecieved;
 	
-	
-	
 	ArrayList<Node> nodes;
-	
 	
 	private Config config;
 		
@@ -42,18 +39,30 @@ public class Node {
 		this.config = config;
 	}
 	
-	public void protocol(int currentTime, int roundNumber){
+	public boolean protocol(int currentTime, int roundNumber){
 		/*
 		 * This runs in every round. must send all the messages 
 		 * and also take care of all the time related issues.
 		 */
 		int myClustersID = this.toplogy.getClusterNumber(this.ID);
 		
-		if(myClustersID == 0) {
+		if(myLayer == 0) {
 			// add input packets and create shares just takes some time!						
 			//Create shares and then bundle them all	
 		}
-		else if(myClustersID != 0 ) {
+		else if (myLayer == this.config.numberOfLayersTopology) {
+			int myClustersParent = this.toplogy.getParent(myClustersID);		
+			ArrayList<Integer> parentsClusterMembers = this.toplogy.getClusterMembers(myClustersParent);
+			ArrayList<NetworkPacket> packetsToBeSentOut = new ArrayList<NetworkPacket>();
+
+			//send packets that needs to be sent
+			for (Integer parentClusterMember:parentsClusterMembers) {
+				int delay = NetworkPacket.getDelayInMilliSeconds(RTTDelayDistributionType.LINEAR, this.config);
+				this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET));
+			}
+
+		}
+		else if(myLayer != this.config.numberOfLayersTopology ) {
 
 			int myClustersParent = this.toplogy.getParent(myClustersID);		
 			ArrayList<Integer> parentsClusterMembers = this.toplogy.getClusterMembers(myClustersParent);
@@ -61,6 +70,10 @@ public class Node {
 
 			if(myLayer == (this.config.numberOfLayersTopology - roundNumber)) {				
 				//if there is a packet in the recieved q then send out the new packets!
+				if(packetsReceived.isEmpty()) {
+					System.out.println(this.ID);
+					return false;
+				}
 			}			
 
 			//send packets that needs to be sent
@@ -69,7 +82,8 @@ public class Node {
 				this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET));
 			}
 		}
-		
+	
+		return true;
 	}
 
 	public void recievePacket(NetworkPacket networkPacket) 

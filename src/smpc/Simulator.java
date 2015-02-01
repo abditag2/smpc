@@ -66,13 +66,15 @@ public class Simulator {
 			}
 
 			// First, pick all the nodes and run the protocol function
+			boolean protocolRan = true;
 			for (Node node : nodes) {
-				if(!node.failed)
-					node.protocol(currentTime, roundNumber);
+				if(!node.failed) {
+					protocolRan &= node.protocol(currentTime, roundNumber);
+				}
 			}
 			
 			//here check for the termination Condition
-			if (terminationConditionMet()) {
+			if (terminationConditionMet(roundNumber, protocolRan)) {
 				//print statistics
 				break;
 			}
@@ -114,26 +116,22 @@ public class Simulator {
 				failedNode.roundsLeft = failedNode.roundsLeft - 1 ; 
 				failedNodes.put(failedNodeID, failedNode);
 			}
-		}
-		
+		}	
 	}
 	
-	private boolean terminationConditionMet() {
+	private boolean terminationConditionMet(int roundNumber, boolean protocolRan) {
 		/*
 		 * condition1: At all the times there must be at least one honest party in each cluster.
 		 */
 		for(int i = 0 ; i< this.config.numberOfClusters(); i++) {
 			ArrayList<Integer> clusterMembers = this.topology.getClusterMembers(i);
 			boolean hasHonestLiveNode = false;
-			System.out.println("cluster Id: " + i);
-			System.out.println("members: "+ clusterMembers.toString());
 			for(Integer memberID:clusterMembers) {
 				Node member = this.nodes.get(memberID);
 
 				if(member.failed == false && member.honest == true) {
 					//if there is at least one honest member that has not failed
 					hasHonestLiveNode = true;
-					System.out.println("good node ID:" + memberID);
 					break;
 				}
 			}
@@ -148,6 +146,20 @@ public class Simulator {
 		 * if the nodes in the last level clusters have gathered their inputs
 		 */
 		
+		if (roundNumber == this.config.numberOfLayersTopology) {
+			System.out.println("Terminatin condition 2");
+			return true;
+		}
+		
+		/*
+		 * condition 3
+		 * if protocol could not run in any of the previous rounds then we cannot converge
+		 */
+		
+		if (protocolRan == false) {
+			System.out.println("Terminatin condition 3");
+			return true;
+		}
 		
 		return false;
 	}

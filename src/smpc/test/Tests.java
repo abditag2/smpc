@@ -60,4 +60,17 @@ public class Tests {
     	
     	//just manually check this outputs :)
     }
+    
+    @Test void testgetMyLayerNumber() {
+    	Config config = new Config();
+    	config.nArry = 3;
+    	config.numberOfLayersTopology  = 10;
+    	Simulator sim = new Simulator(config);
+    	
+    	int layer = sim.getMyLayerNumber(12, config);
+    	
+    	assertEquals(layer,3);
+    	
+    	
+    }
 }

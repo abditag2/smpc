@@ -1,28 +1,40 @@
 package smpc.Abstracts;
 
 import smpc.Config;
+import smpc.Topology;
+import smpc.Abstracts.NetworkPacket.PacketType;
+import smpc.Abstracts.NetworkPacket.RTTDelayDistributionType;
 
 import java.util.LinkedList;
-import java.util.Iterator;
-import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.ArrayList;
 
 
 public class Node {
 	public int ID;
+	public int myLayer;
+	
 	public boolean honest;
 	public boolean failed;
 	
+	public Topology toplogy;
 	public LinkedList<NetworkPacket> packetsReceived;
 	public TreeSet<NetworkPacket> packetQToBeRecieved;
 	
 	
+	
+	ArrayList<Node> nodes;
+	
+	
 	private Config config;
 		
-	public Node(int ID, Config config, boolean honest, boolean failed) {
+	public Node(int ID, Config config, ArrayList<Node> nodes, Topology topology, boolean honest, boolean failed, int myLayer) {
 		this.ID = ID;
 		this.honest = honest;
 		this.failed = failed;
+		this.toplogy = topology;
+		this.nodes = nodes;
+		this.myLayer = myLayer;
 		
 		packetQToBeRecieved = new TreeSet<NetworkPacket>();
 		packetsReceived = new LinkedList<NetworkPacket>();
@@ -30,20 +42,39 @@ public class Node {
 		this.config = config;
 	}
 	
-	public void protocol(){
+	public void protocol(int currentTime, int roundNumber){
 		/*
 		 * This runs in every round. must send all the messages 
 		 * and also take care of all the time related issues.
 		 */
+		int myClustersID = this.toplogy.getClusterNumber(this.ID);
 		
-		
-		
+		if(myClustersID == 0) {
+			// add input packets and create shares just takes some time!						
+			//Create shares and then bundle them all	
+		}
+		else if(myClustersID != 0 ) {
+
+			int myClustersParent = this.toplogy.getParent(myClustersID);		
+			ArrayList<Integer> parentsClusterMembers = this.toplogy.getClusterMembers(myClustersParent);
+			ArrayList<NetworkPacket> packetsToBeSentOut = new ArrayList<NetworkPacket>();
+
+			if(myLayer == (this.config.numberOfLayersTopology - roundNumber)) {				
+				//if there is a packet in the recieved q then send out the new packets!
+			}			
+
+			//send packets that needs to be sent
+			for (Integer parentClusterMember:parentsClusterMembers) {
+				int delay = NetworkPacket.getDelayInMilliSeconds(RTTDelayDistributionType.LINEAR, this.config);
+				this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET));
+			}
+		}
 		
 	}
 
 	public void recievePacket(NetworkPacket networkPacket) 
 	{
-		packetQToBeRecieved.add(networkPacket);
+		this.packetQToBeRecieved.add(networkPacket);
 	}
 	
 

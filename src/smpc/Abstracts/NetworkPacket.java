@@ -1,29 +1,46 @@
 package smpc.Abstracts;
 
 import java.util.Enumeration;
+import java.util.Random;
+
+import smpc.Config;
 
 public class NetworkPacket implements Comparable {
 	int startTime;
-	int totalPacketContent;
-	float numberOfRemainingPackets;
-	
+	float numberOfRemainingPackets;	
 	PacketType packetType;
 
-	public enum PacketType{
-	    PHASE1, PHASE2
-	}	
-	
-	public NetworkPacket(int startTime, int totalPacketContent, PacketType packetType) {
+
+	public NetworkPacket(int startTime, PacketType packetType) {
 		this.startTime = startTime;
-		this.numberOfRemainingPackets = totalPacketContent;
-		this.totalPacketContent = totalPacketContent;
 		this.packetType = packetType;
+	}
+	
+	
+	static public int getDelayInMilliSeconds(RTTDelayDistributionType distribution, Config config){
+		double RTTDelay = 0;
+		
+		if(distribution == RTTDelayDistributionType.LINEAR) {
+			Random rndGen = new Random();
+			RTTDelay = (double)config.RTTmin + rndGen.nextDouble() * (double)(config.RTTmax - config.RTTmin);
+		}
+		return (int) RTTDelay;
 	}
 
 	@Override
 	public int compareTo(Object o) {
-		// TODO Auto-generated method stub
 		NetworkPacket anotherPacket = (NetworkPacket) o ;
 		return anotherPacket.startTime - this.startTime;
 	}
+
+	public enum PacketType{
+	    INPUTPACKET, 
+	    FORWAREDPACKET,
+	    COMBINEDPACKET
+	}	
+	
+	public enum RTTDelayDistributionType{
+	    LINEAR
+	}	
+	
 }

@@ -45,7 +45,11 @@ public class Topology {
 	
 	
 	public int getParent(int clusterID){
-		return clusterParents.get(clusterID);
+		Integer parent = this.clusterParents.get(clusterID);
+		if (parent != null)
+			return parent;
+		else
+			return -1;
 	}
 	
 	public int getClusterNumber(int nodeId){

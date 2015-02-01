@@ -14,7 +14,7 @@ public class Config {
 	}
 
 	// RTT parameters needs to be defined. The following are for the linear
-	// distribution
+	// distribution in milliseconds
 	public int RTTmin;
 	public int RTTmax;
 
@@ -31,7 +31,10 @@ public class Config {
 	public int failureRate;
 	
 	//Recovrytime in number of rounds that it takes to recover
-	public int recoveryTime;
+	public int recoveryTime;	
+	
+	//Size of the final cluster that performs the calculations
+	public int lastClusterSize;
 	
 	public Config() {
 		/*
@@ -49,5 +52,6 @@ public class Config {
 
 		this.failureRate = 100;
 		this.recoveryTime = 7;
+		this.lastClusterSize = 40;
 	}
 }

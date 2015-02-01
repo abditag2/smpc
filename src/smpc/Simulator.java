@@ -17,11 +17,13 @@ public class Simulator {
 
 	public void initialize() {
 		nodes = new ArrayList<Node>();
-		this.config = config;
 		this.topology = new Topology(this.config);
 
 		for (int id = 0; id < config.numberOfnodes; id++) {
-			nodes.add(new Node(id, config, true, false));
+			int nodeCluster = topology.getClusterNumber(id);
+			int myLayer = getMyLayerNumber(nodeCluster, this.config);
+			nodes.add(new Node(id, config, nodes, this.topology, true, false, myLayer));
+
 		}
 
 		// set the subset to be corrupted
@@ -35,6 +37,16 @@ public class Simulator {
 
 	}
 
+	public int getMyLayerNumber(int nodeCluster, Config config) {
+		for(int i = 1; i < config.numberOfLayersTopology; i++) {
+			if( i >= Math.pow(config.nArry, i-1) ) {
+				return i;
+			}
+		}
+		return 0;
+	}
+
+
 	public void simulate() {
 
 		int currentTime = 0;
@@ -42,6 +54,7 @@ public class Simulator {
 
 		HashMap<Integer, FailedNode> failedNodes = new HashMap<Integer, FailedNode>();
 		
+		int roundNumber = 1;
 		while (true) {
 			//Handle failres and recoveries
 			failAndRecover(failedNodes);
@@ -55,7 +68,7 @@ public class Simulator {
 			// First, pick all the nodes and run the protocol function
 			for (Node node : nodes) {
 				if(!node.failed)
-					node.protocol();
+					node.protocol(currentTime, roundNumber);
 			}
 			
 			//here check for the termination Condition
@@ -66,8 +79,11 @@ public class Simulator {
 			
 			currentTime = endOfCycle;
 			endOfCycle = endOfCycle + this.config.lengthOfRound;
+			roundNumber++;
 			// TODO: insert the condition for the ending and also set the
 			// counters
+			
+			
 		}
 	}
 

@@ -44,47 +44,63 @@ public class Node {
 		 * This runs in every round. must send all the messages 
 		 * and also take care of all the time related issues.
 		 */
-		int myClustersID = this.toplogy.getClusterNumber(this.ID);
 		
-		if(myLayer == 0) {
-			// add input packets and create shares just takes some time!						
-			//Create shares and then bundle them all	
+		if(this.failed || !this.honest) {
+			//if node has failed or is not honest I assume that it does not send the packet
+			return true;
 		}
-		else if (myLayer == this.config.numberOfLayersTopology) {
-			int myClustersParent = this.toplogy.getParent(myClustersID);		
-			ArrayList<Integer> parentsClusterMembers = this.toplogy.getClusterMembers(myClustersParent);
-			ArrayList<NetworkPacket> packetsToBeSentOut = new ArrayList<NetworkPacket>();
-
-			//send packets that needs to be sent
-			for (Integer parentClusterMember:parentsClusterMembers) {
-				int delay = NetworkPacket.getDelayInMilliSeconds(RTTDelayDistributionType.LINEAR, this.config);
-				this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET));
+		else {
+			
+			int myClustersID = this.toplogy.getClusterNumber(this.ID);
+			
+			if(myLayer == 1) {
+				// add input packets and create shares just takes some time!						
+				//Create shares and then bundle them all	
 			}
-
-		}
-		else if(myLayer != this.config.numberOfLayersTopology ) {
-
-			int myClustersParent = this.toplogy.getParent(myClustersID);		
-			ArrayList<Integer> parentsClusterMembers = this.toplogy.getClusterMembers(myClustersParent);
-			ArrayList<NetworkPacket> packetsToBeSentOut = new ArrayList<NetworkPacket>();
-
-			if(myLayer == (this.config.numberOfLayersTopology - roundNumber)) {				
-				//if there is a packet in the recieved q then send out the new packets!
-				if(packetsReceived.isEmpty()) {
-					System.out.println(this.ID);
-					return false;
+			else if (myLayer == this.config.numberOfLayersTopology) {
+				//if I am a leaf node in the topology
+				int myClustersParent = this.toplogy.getParent(myClustersID);		
+				ArrayList<Integer> parentsClusterMembers = this.toplogy.getClusterMembers(myClustersParent);
+				ArrayList<NetworkPacket> packetsToBeSentOut = new ArrayList<NetworkPacket>();
+				
+				//send packets that needs to be sent
+				for (Integer parentClusterMember:parentsClusterMembers) {
+					int delay = NetworkPacket.getDelayInMilliSeconds(RTTDelayDistributionType.LINEAR, this.config);
+					this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET));
 				}
-			}			
-
-			//send packets that needs to be sent
-			for (Integer parentClusterMember:parentsClusterMembers) {
-				int delay = NetworkPacket.getDelayInMilliSeconds(RTTDelayDistributionType.LINEAR, this.config);
-				this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET));
+				
+			}
+			else if(myLayer != this.config.numberOfLayersTopology ) {
+				
+				//TODO: check if all the packets from the nodes in the previous cluster are the same
+				
+				//Next, send one packet to each of the parent cluster members
+				int myClustersParent = this.toplogy.getParent(myClustersID);		
+				ArrayList<Integer> parentsClusterMembers = this.toplogy.getClusterMembers(myClustersParent);
+				ArrayList<NetworkPacket> packetsToBeSentOut = new ArrayList<NetworkPacket>();
+				
+				if(myLayer == (this.config.numberOfLayersTopology - roundNumber)) {				
+					//if there is a packet in the recieved q then send out the new packets!
+					if(packetsReceived.isEmpty()) {
+						System.out.println("this node did not reciece anypackets:" + this.ID);
+						return false;
+					}
+				}			
+				
+				//send packets that needs to be sent
+				for (Integer parentClusterMember:parentsClusterMembers) {
+					int delay = NetworkPacket.getDelayInMilliSeconds(RTTDelayDistributionType.LINEAR, this.config);
+					this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET));
+				}
+				
+				//remove the packets in the recieved queue
+				this.packetsReceived.clear();
 			}
 		}
 	
 		return true;
 	}
+	
 
 	public void recievePacket(NetworkPacket networkPacket) 
 	{

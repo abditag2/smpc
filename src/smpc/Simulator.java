@@ -1,5 +1,8 @@
 package smpc;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 import smpc.Abstracts.*;
@@ -66,11 +69,15 @@ public class Simulator {
 			}
 
 			// First, pick all the nodes and run the protocol function
-			boolean protocolRan = true;
-			for (Node node : nodes) {
-				if(!node.failed) {
-					protocolRan &= node.protocol(currentTime, roundNumber);
+			//From every cluster at least one node must be able to run the protocl otherwise the protocol will be considered as failed.
+			boolean protocolRan = true;			
+			for (int clusterID =0 ; clusterID < this.config.numberOfClusters(); clusterID++) {
+				boolean protocolRanAtLeastOnce = false;
+				for (int nodeID:this.topology.getClusterMembers(clusterID)) {
+					Node node = this.nodes.get(nodeID);
+					protocolRanAtLeastOnce |= node.protocol(currentTime, roundNumber);		
 				}
+				protocolRan &= protocolRanAtLeastOnce;
 			}
 			
 			//here check for the termination Condition
@@ -135,29 +142,30 @@ public class Simulator {
 					break;
 				}
 			}
+			
 			if (!hasHonestLiveNode) {		
-				System.out.println("Termination Condition 1");
+				System.out.println("Termination condition 1");
 				return true;
 			}
 		}
-		
+
 		/*
 		 * condition 2
-		 * if the nodes in the last level clusters have gathered their inputs
-		 */
-		
-		if (roundNumber == this.config.numberOfLayersTopology) {
-			System.out.println("Terminatin condition 2");
-			return true;
-		}
-		
-		/*
-		 * condition 3
 		 * if protocol could not run in any of the previous rounds then we cannot converge
 		 */
 		
 		if (protocolRan == false) {
-			System.out.println("Terminatin condition 3");
+			System.out.println("Terminatin condition 2");
+			return true;
+		}
+		
+
+		/*
+		 * Successful Termination
+		 * if the nodes in the last level clusters have gathered their inputs
+		 */
+		if (roundNumber == this.config.numberOfLayersTopology) {
+			System.out.println("Succussful termination.");
 			return true;
 		}
 		
@@ -195,14 +203,23 @@ public class Simulator {
 
 
 	public static void main(String[] args) {
-		System.out.println("Simulation Starting ...");
-		Config config = new Config();
-		Simulator sim = new Simulator(config);
-		System.out.println("Simulation Initializing ...");
-		sim.initialize();
-		System.out.println("Simulating ...");
-		sim.simulate();
-
+		PrintStream out = null;
+		
+//		try {
+//			out = new PrintStream(new FileOutputStream("output.txt"));
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		System.setOut(out);
+		
+		for(int i = 0; i < 1; i++) {
+			Config config = new Config();
+			Simulator sim = new Simulator(config);
+			sim.initialize();
+			sim.simulate();
+		}
 	}
 	
 	public class FailedNode{

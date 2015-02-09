@@ -42,16 +42,21 @@ public class Config {
 		 */
 		
 		this.nArry = 2;
-		this.numberOfLayersTopology = 5;
-		this.numberOfnodes = 1000;
+
+		this.numberOfLayersTopology = 4;
+		this.numberOfnodes = 100;
+
 		this.RTTmin = 10;
 		this.RTTmax = 20;
+		
 		this.nodeIncomingBandWidth = 100;
+		
 		this.lengthOfRound = 100;
-		this.percentOfCorruptedNodes = 80;
+		this.percentOfCorruptedNodes = 50;
 
 		this.failureRate = 100;
-		this.recoveryTime = 7;
+		this.recoveryTime = 20;
+		
 		this.lastClusterSize = 40;
 	}
 }

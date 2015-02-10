@@ -13,6 +13,7 @@ public class Simulator {
 	public Topology topology;
 	public Config config;	
 	
+	
 	public Simulator(Config config) {
 		this.config = config;
 	}
@@ -25,7 +26,8 @@ public class Simulator {
 		for (int id = 0; id < config.numberOfnodes; id++) {
 			int nodeCluster = topology.getClusterNumber(id);
 			int myLayer = getMyLayerNumber(nodeCluster, this.config);
-			nodes.add(new Node(id, config, nodes, this.topology, true, false, myLayer));
+			int myCluster = this.topology.getClusterNumber(id);
+			nodes.add(new Node(id, config, nodes, this.topology, true, false, myLayer, myCluster));
 
 		}
 
@@ -41,10 +43,10 @@ public class Simulator {
 	}
 
 	public int getMyLayerNumber(int nodeCluster, Config config) {
-		for(int i = 1; i < config.numberOfLayersTopology; i++) {
-			if( i >= Math.pow(config.nArry, i-1) ) {
+		for(int i = 0; i < config.numberOfLayersTopology; i++) {
+			if( nodeCluster < Math.pow(config.nArry, i+1 )-1 ) {
 				return i;
-			}
+			}		
 		}
 		return 0;
 	}
@@ -57,11 +59,12 @@ public class Simulator {
 
 		HashMap<Integer, FailedNode> failedNodes = new HashMap<Integer, FailedNode>();
 		
-		int roundNumber = 1;
+		int roundNumber = 0;
 		while (true) {
-			//Handle failres and recoveries
+			//Handle failures and recoveries
 			failAndRecover(failedNodes);
-			
+			System.out.println("round number:" + roundNumber);
+			System.out.println("number of failed nodes: "+ failedNodes.size());
 			//for all the nodes schedule their incoming packets
 			for (Node node : nodes) {
 				if(!node.failed)
@@ -89,10 +92,6 @@ public class Simulator {
 			currentTime = endOfCycle;
 			endOfCycle = endOfCycle + this.config.lengthOfRound;
 			roundNumber++;
-			// TODO: insert the condition for the ending and also set the
-			// counters
-			
-			
 		}
 	}
 
@@ -101,6 +100,7 @@ public class Simulator {
 		// find nodes that have failed during this cycle and set them to fail
 		ArrayList<FailedNode>newFailedNodes = getFailedNodes(config.numberOfnodes,
 				config.failureRate, config.lengthOfRound);
+
 		//Update the failed nodes list
 		for(FailedNode failedNode:newFailedNodes) {
 			failedNodes.put(failedNode.ID, failedNode);
@@ -113,14 +113,14 @@ public class Simulator {
 			Map.Entry<Integer, FailedNode> pair = failedNodesIterator.next();
 			Integer failedNodeID = pair.getKey();
 			FailedNode failedNode = failedNodes.get(failedNodeID);
-			if (failedNode.roundsLeft -1 == 0) {
+			if (failedNode.timeLeftToRecoverMilliseconds -this.config.lengthOfRound <= 0) {
 				//recover the Node
 				failedNodesIterator.remove();
 				this.nodes.get(failedNodeID).failed = false;
 			}
 			else {
 				//reduce the remained time
-				failedNode.roundsLeft = failedNode.roundsLeft - 1 ; 
+				failedNode.timeLeftToRecoverMilliseconds = failedNode.timeLeftToRecoverMilliseconds - this.config.lengthOfRound ; 
 				failedNodes.put(failedNodeID, failedNode);
 			}
 		}	
@@ -173,10 +173,10 @@ public class Simulator {
 	}
 
 	public ArrayList<FailedNode> getFailedNodes(int totalNumberOfNodes,
-		int failureRate, int timeLengthMinute) {
+		int failureRate, int timeLengthMilliSeconds) {
 		ArrayList<FailedNode> results = new ArrayList<>();
 		//this is the average of the numbers that should fail in this round
-		double failedNumberAvg= (double)totalNumberOfNodes/(double)failureRate * ((double)timeLengthMinute/(double)60) ;		
+		double failedNumberAvg= (double)totalNumberOfNodes/(double)failureRate * ((double)timeLengthMilliSeconds/(double)60000) ;
 		
 		//here we calculate the exact number of nodes that must fail with a gausian distribution
 		//following the previous mean and deviation of 1 
@@ -223,11 +223,11 @@ public class Simulator {
 	}
 	
 	public class FailedNode{
-		int roundsLeft;
+		int timeLeftToRecoverMilliseconds;
 		int ID;
 		public FailedNode(int roundsLeft, int ID) {
 			this.ID = ID;
-			this.roundsLeft = roundsLeft;
+			this.timeLeftToRecoverMilliseconds = roundsLeft;
 		}
 	}
 

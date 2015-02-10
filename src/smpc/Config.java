@@ -1,5 +1,7 @@
 package smpc;
 
+import smpc.Abstracts.NetworkPacket.RTTDelayDistributionType;
+
 public class Config {
 
 	// Modify these
@@ -13,13 +15,15 @@ public class Config {
 		return (int) Math.pow(nArry, numberOfLayersTopology) - 1;
 	}
 
+	public RTTDelayDistributionType delayDistType;
 	// RTT parameters needs to be defined. The following are for the linear
 	// distribution in milliseconds
 	public int RTTmin;
 	public int RTTmax;
-
-	// this parameter is to determine the nodes incoming bandwidth
-	public int nodeIncomingBandWidth;
+	
+	//RTTParams for GAUSSIAN distribution
+	public int avg;
+	public int deviation;
 
 	// waitingTime for the nodes in each round
 	public int lengthOfRound;
@@ -30,7 +34,7 @@ public class Config {
 	// set the failure rate for servers (lifetime in hours)
 	public int failureRate;
 	
-	//Recovrytime in number of rounds that it takes to recover
+	//time that it takes for a node to recover in Milliseconds
 	public int recoveryTime;	
 	
 	//Size of the final cluster that performs the calculations
@@ -43,20 +47,25 @@ public class Config {
 		
 		this.nArry = 2;
 
-		this.numberOfLayersTopology = 4;
-		this.numberOfnodes = 100;
+		this.numberOfLayersTopology = 10;
+		this.numberOfnodes = 100000;
 
-		this.RTTmin = 10;
-		this.RTTmax = 20;
+		this.delayDistType = RTTDelayDistributionType.GAUSSIAN;
 		
-		this.nodeIncomingBandWidth = 100;
+		this.RTTmin = 200;//milliseconds
+		this.RTTmax = 400;//milliseconds
 		
-		this.lengthOfRound = 100;
-		this.percentOfCorruptedNodes = 50;
+		this.lengthOfRound = 60000; //milliseconds
+		this.percentOfCorruptedNodes = 90;
 
-		this.failureRate = 100;
-		this.recoveryTime = 20;
+		//This is the hours that a machine works on average before failing
+		this.failureRate = 8544/3; //HOurs //three times failure per year for a system
+		this.recoveryTime = 48*60*60*1000; //48 Hours
 		
 		this.lastClusterSize = 40;
+		
+		//RTTParams for GAUSSIAN distribution
+		this.avg = 250;//milliseconds
+		this.deviation = 150;//milliseconds
 	}
 }

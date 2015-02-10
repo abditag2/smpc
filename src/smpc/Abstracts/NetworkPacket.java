@@ -19,11 +19,16 @@ public class NetworkPacket implements Comparable {
 	
 	static public int getDelayInMilliSeconds(RTTDelayDistributionType distribution, Config config){
 		double RTTDelay = 0;
+		Random rndGen = new Random();
 		
 		if(distribution == RTTDelayDistributionType.LINEAR) {
-			Random rndGen = new Random();
 			RTTDelay = (double)config.RTTmin + rndGen.nextDouble() * (double)(config.RTTmax - config.RTTmin);
 		}
+		
+		if(distribution == RTTDelayDistributionType.GAUSSIAN) {
+			RTTDelay = (double)config.avg + rndGen.nextGaussian()*config.deviation;
+		}
+		
 		return (int) RTTDelay;
 	}
 
@@ -40,7 +45,8 @@ public class NetworkPacket implements Comparable {
 	}	
 	
 	public enum RTTDelayDistributionType{
-	    LINEAR
+	    LINEAR,
+	    GAUSSIAN
 	}	
 	
 }

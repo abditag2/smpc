@@ -69,9 +69,6 @@ public class MainClusterNode {
             if (count > 100)
                 System.out.println("Stuck on Node: " + left1);
 
-
-            System.out.println("Nodes left: " + edgeNodesList.size());
-
             Pair startTimesMinPairinfo = Utils.minValueLargerThanCurrent(startTimes, currentTime);
             float startTimesMin = (float) startTimesMinPairinfo.getValue();
             int startTimesMinID = (int) startTimesMinPairinfo.getKey();

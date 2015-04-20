@@ -45,7 +45,7 @@ public class MainClusterNode {
             dataSize = 0;
     }
 
-    public void runSimulation(){
+    public float[] runSimulation(){
 
         float lastEventTime = 0 ;
 
@@ -56,8 +56,21 @@ public class MainClusterNode {
             startTimes[i] = Utils.GetCommunicationSetupOverHead(i) + Utils.GetNetworkDelay(i) + currentTime + (float)0.0001;
         }
 
-
+        int left1 = 0 ;
+        int left2 = 0;
+        int count = 0 ;
         while( (int) Utils.Min(startTimes).getKey() != -1){
+
+            left2 = left1;
+            left1 = edgeNodesList.size();
+            if(left2 == left1) count++;
+            else count = 0;
+
+            if (count > 100)
+                System.out.println("Stuck on Node: " + left1);
+
+
+            System.out.println("Nodes left: " + edgeNodesList.size());
 
             Pair startTimesMinPairinfo = Utils.minValueLargerThanCurrent(startTimes, currentTime);
             float startTimesMin = (float) startTimesMinPairinfo.getValue();
@@ -70,31 +83,29 @@ public class MainClusterNode {
             //store the time of the last event before updating the gloabltime
             lastEventTime = currentTime;
 
-            if(currentTime == 0){
-                //it is beginning of simulation event
-                currentTime = 0;
-            }
-            else if(startTimesMin < endTimesMin){
+            if(startTimesMin < endTimesMin){
                 //it is a start  event
                 currentTime = startTimesMin;
                 updateRemainingData(lastEventTime);
                 updateEndtimes(currentTime);
             }
-            else if(startTimesMin > endTimesMin){
+            else if(startTimesMin >= endTimesMin){
                 //it is a end  event
                 //update remaining data before removing finished flows
-                updateRemainingData(lastEventTime);
                 currentTime = endTimesMin;
+                updateRemainingData(lastEventTime);
 
                 //this is the end of a flow, remove the flows that end
                 if(!edgeNodesList.isEmpty()){
                     EdgeNode node = edgeNodesList.remove(0);
                     remainingData[endTimesMinID] = node.dataSize;
                     startTimes[endTimesMinID] = Utils.GetCommunicationSetupOverHead(endTimesMinID) + Utils.GetNetworkDelay(endTimesMinID) + currentTime;
+                    endTimes[endTimesMinID] = Float.MAX_VALUE;
                 }
                 else{
-                    remainingData[endTimesMinID] = Integer.MAX_VALUE;
-                    startTimes[endTimesMinID] = Integer.MAX_VALUE;
+                    remainingData[endTimesMinID] = Float.MAX_VALUE;
+                    startTimes[endTimesMinID] = Float.MAX_VALUE;
+                    endTimes[endTimesMinID] = Float.MAX_VALUE;
                 }
 
                 //update end times after finished flows are over and the new values are updated
@@ -102,24 +113,30 @@ public class MainClusterNode {
 
             }
         }
+
+        float[] resultArray = new float[2];
+        resultArray[0] = currentTime; // time of finishing the flows
+        return resultArray;
     }
 
 
     public void updateEndtimes(float currentTime){
-        //update all the end times based on the number of active flows
-        float rate = Utils.GetRateBasedOnNumberOfActiveFlows(Config.BANDWIDTH, currentTime, startTimes);
+        //update all the end times for the only active flows based on the number of active flows
+        float rate = Utils.GetRateBasedOnNumberOfActiveFlows(Config.BANDWIDTH, currentTime, startTimes, endTimes);
         for (int i = 0 ; i < Config.CONCURRENT_CONNECTIONS ; i ++){
-            endTimes[i] = remainingData[i]/rate + currentTime;
+            if(startTimes[i] <= currentTime ){
+                endTimes[i] = remainingData[i]/rate + currentTime;
+            }
         }
     }
 
     public void updateRemainingData(float lastEventTime){
         //calculate the rate and update the remaining of datasize for each channel
-        float rate = Utils.GetRateBasedOnNumberOfActiveFlows(Config.BANDWIDTH, currentTime, startTimes);
+        float rate = Utils.GetRateBasedOnNumberOfActiveFlows(Config.BANDWIDTH, lastEventTime, startTimes, endTimes);
 
         //update all the remaining data based on how much time has passed since last event and what the rate is
         for (int i = 0 ; i < Config.CONCURRENT_CONNECTIONS ; i ++){
-            if (startTimes[i] < currentTime && endTimes[i] > currentTime){
+            if (startTimes[i] < currentTime && endTimes[i] >= currentTime){
                 remainingData[i] = remainingData[i] - rate * (currentTime - lastEventTime);
             }
         }

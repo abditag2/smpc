@@ -18,9 +18,13 @@ public class Simulator {
 
     public static void main(String[] args){
 
+        System.out.println("Simulation started");
         Config config = new Config();
         MainClusterNode mainNode = new MainClusterNode();
-        mainNode.runSimulation();
+        float[] results = mainNode.runSimulation();
+
+        System.out.println("Results:");
+        System.out.println("\ttime: " + results[0]);
 
 
     }

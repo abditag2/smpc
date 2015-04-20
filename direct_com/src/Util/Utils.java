@@ -3,6 +3,7 @@ package Util;
 import Config.Config;
 
 import javafx.util.Pair;
+import java.util.Random;
 
 /**
  * Created by tanish on 4/19/15.
@@ -10,11 +11,12 @@ import javafx.util.Pair;
 public class Utils {
 
     public static float GetNetworkDelay(int ID){
-        return 0;
+        Random r = new Random();
+        return (float) r.nextGaussian() * Config.STD_DEVIATION_NETWORK_DELAY + Config.NETWORK_DELAY_AVERAGE;
     }
 
     public static float GetCommunicationSetupOverHead(int ID){
-        return 0;
+        return Config.COMMUNICATION_SETUP_OVERHEAD;
     }
 
     public static int GetDataSizeForNode(int nodeID){
@@ -54,24 +56,24 @@ public class Utils {
         return pairRV;
     }
 
-    public static int GetNumberOfActiveFlows(float currentTime, float[] startTimes){
+    public static int GetNumberOfActiveFlows(float currentTime, float[] startTimes, float[] endTimes){
         int countOfActiveChannels = 0;
         for(int i = 0 ; i < Config.CONCURRENT_CONNECTIONS ; i++){
-            if (startTimes[i] <= currentTime){
+            if (startTimes[i] <= currentTime && endTimes[i] > currentTime){
                 countOfActiveChannels++;
             }
         }
         return countOfActiveChannels;
     }
 
-    public static float GetRateBasedOnNumberOfActiveFlows(float bandwidth, float currentTime, float[] startTimes){
+    public static float GetRateBasedOnNumberOfActiveFlows(float bandwidth, float currentTime, float[] startTimes, float[] endTimes){
         float rate = 0 ;
-        int countOfActiveChannels = GetNumberOfActiveFlows(currentTime, startTimes);
+        int countOfActiveChannels = GetNumberOfActiveFlows(currentTime, startTimes, endTimes);
         if (countOfActiveChannels > 0 ){
             rate = bandwidth / countOfActiveChannels;
         }
         else{
-            rate = 0;
+            rate = Config.BANDWIDTH;
         }
         return rate;
     }

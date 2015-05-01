@@ -5,13 +5,17 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.*;
 
+import org.omg.CORBA.INTERNAL;
 import smpc.Abstracts.*;
+import java.io.PrintWriter;
 
 public class Simulator {
 
 	public ArrayList<Node> nodes;
 	public Topology topology;
-	public Config config;	
+	public Config config;
+
+	public boolean searchForMinimumRoundLength = false;
 	
 	
 	public Simulator(Config config) {
@@ -52,7 +56,9 @@ public class Simulator {
 	}
 
 
-	public void simulate() {
+	public boolean simulate() {
+
+		//returns true if the time was enough
 
 		int currentTime = 0;
 		int endOfCycle = currentTime + this.config.lengthOfRound;
@@ -61,14 +67,24 @@ public class Simulator {
 		
 		int roundNumber = 0;
 		while (true) {
+
 			//Handle failures and recoveries
-			failAndRecover(failedNodes);
-			System.out.println("round number:" + roundNumber);
-			System.out.println("number of failed nodes: "+ failedNodes.size());
+			if(config.failureRate != Integer.MAX_VALUE){
+				failAndRecover(failedNodes);
+			}
+
+//			System.out.println("round number:" + roundNumber);
+//			System.out.println("number of failed nodes: "+ failedNodes.size());
 			//for all the nodes schedule their incoming packets
+			boolean didAllTheNodesHadEnoughTimeToRecieveTheirPackets = true;
 			for (Node node : nodes) {
 				if(!node.failed)
-					node.schedlueIncomingPackets(currentTime, endOfCycle);
+					didAllTheNodesHadEnoughTimeToRecieveTheirPackets &= node.schedlueIncomingPackets(currentTime, endOfCycle, roundNumber);
+			}
+
+			if(this.searchForMinimumRoundLength && !didAllTheNodesHadEnoughTimeToRecieveTheirPackets){
+				//some nodes did not have enough time to deliver all their data. So, break simulation and increase the round duration time.
+				return false;
 			}
 
 			// First, pick all the nodes and run the protocol function
@@ -93,6 +109,7 @@ public class Simulator {
 			endOfCycle = endOfCycle + this.config.lengthOfRound;
 			roundNumber++;
 		}
+		return true;
 	}
 
 	
@@ -213,12 +230,88 @@ public class Simulator {
 //		}
 //		
 //		System.setOut(out);
-		
-		for(int i = 0; i < 1; i++) {
+
+		boolean searchForMinimumRoundLength  = true ;
+
+		// search for a minimum round duration time that all the packets can be delivered
+		if (searchForMinimumRoundLength == false){
 			Config config = new Config();
+			config.lengthOfRound = 30000;
 			Simulator sim = new Simulator(config);
 			sim.initialize();
 			sim.simulate();
+		}
+
+		else if (searchForMinimumRoundLength == true){
+			// do experiment on failre and etc
+			try{
+				PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
+
+				for(int bandWidth = 10 ; bandWidth < 1000 ; bandWidth = bandWidth + 100){
+					for(int delay = 10 ; delay < 1000 ; delay = delay + 100){
+						for(int dataSize = 1 ; dataSize < 10000 ; dataSize = dataSize = dataSize + 100){
+
+							int currentLengthBeforeChange = 0;
+							int acceptableTimeError = 30;
+							boolean timeEnough = false;
+							int lastLength = 0;
+							int minLength = 0;
+							int maxLength = 1000000;
+							int currentLength = (maxLength + minLength)/2;
+
+							while(true)
+							{
+								System.out.println("length: " + currentLength);
+
+								//set simulation configuration
+								Config config = new Config();
+
+								//settings that do not change
+								config.delayDistType = NetworkPacket.RTTDelayDistributionType.CONSTANT;
+								config.failureRate = Integer.MAX_VALUE;
+								config.numberOfnodes = 100000;
+
+								//settings that change
+								config.nodeInitialDataSize = dataSize;
+								config.bandWidth = bandWidth;
+								config.constantDelay = delay;
+
+								config.lengthOfRound = currentLength ;
+
+								Simulator sim = new Simulator(config);
+								sim.searchForMinimumRoundLength = true;
+								sim.initialize();
+								timeEnough = sim.simulate();
+
+								//adjust the time for next cycles
+								lastLength = currentLengthBeforeChange;
+								currentLengthBeforeChange = currentLength;
+
+								if (!timeEnough)	{
+									minLength = currentLength;
+									currentLength = (currentLength + maxLength)/2 ;
+
+								}
+								else if (timeEnough){
+									if(Math.abs(currentLengthBeforeChange - lastLength)< acceptableTimeError){
+										return;
+									}else{
+										maxLength = currentLength;
+										currentLength = (currentLength + minLength) / 2;
+									}
+								}
+							}
+						}
+					}
+				}
+
+				writer.close();
+			}
+			catch (Exception e){
+				System.out.println("error occured");
+			}
+
+
 		}
 	}
 	

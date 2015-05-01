@@ -3,7 +3,6 @@ package smpc.Abstracts;
 import smpc.Config;
 import smpc.Topology;
 import smpc.Abstracts.NetworkPacket.PacketType;
-import smpc.Abstracts.NetworkPacket.RTTDelayDistributionType;
 
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -20,7 +19,9 @@ public class Node {
 	
 	public Topology toplogy;
 	public LinkedList<NetworkPacket> packetsReceived;
-	public TreeSet<NetworkPacket> packetQToBeRecieved;
+	public LinkedList<NetworkPacket> packetQToBeRecieved;
+	public float sizeOfReceivedData;
+	float dataRecievedInThisCycleForThisNode = 0;
 	
 	ArrayList<Node> nodes;
 	
@@ -35,10 +36,12 @@ public class Node {
 		this.myLayer = myLayer;
 		this.myCluster = myCluster;
 		
-		packetQToBeRecieved = new TreeSet<NetworkPacket>();
-		packetsReceived = new LinkedList<NetworkPacket>();
+		this.packetQToBeRecieved = new LinkedList<NetworkPacket>();
+		this.packetsReceived = new LinkedList<NetworkPacket>();
 		
 		this.config = config;
+
+		this.sizeOfReceivedData = config.nodeInitialDataSize;
 	}
 	
 	public boolean protocol(int currentTime, int roundNumber){
@@ -67,10 +70,13 @@ public class Node {
 				//send packets that needs to be sent
 //				System.out.println("current time: " + currentTime + " round number: "+ roundNumber + " clusterID: " + myClustersID);
 				for (Integer parentClusterMember:parentsClusterMembers) {
+//					System.out.println("from " + this.ID + " in: " + myClustersID+ " to " + parentClusterMember + " in c: " + this.toplogy.getParent(myClustersID));
 					int delay = NetworkPacket.getDelayInMilliSeconds(this.config.delayDistType, this.config);
 //					System.out.println(delay + " dest: " + parentClusterMember);
-					this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET));
+					this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET, config.nodeInitialDataSize, 0, this.ID, parentClusterMember));
 				}
+				//after the data that needs to be sent is sent, it is set to 0
+				dataRecievedInThisCycleForThisNode = 0;
 				
 			}
 			else if(roundNumber!= 0 && myLayer != this.config.numberOfLayersTopology-1 ){
@@ -86,22 +92,23 @@ public class Node {
 //					System.out.println("cID: " + this.myCluster + " current time: " + currentTime + " round number: "+ roundNumber);
 					//if there is a packet in the recieved q then send out the new packets!
 					if(packetsReceived.isEmpty()) {
-//						System.out.println("this node did not reciece anypackets:" + this.ID + " cID: " + myClustersID);
-						System.exit(0);
+						//TODO we may need to add something here for the case there is no packets
+//						System.exit(0);
 						return false;
 					}
-					else {
-//						System.out.println("this node packets:" + this.ID + " cID: " + myClustersID);
-					}
+
 					//send packets that needs to be sent
 					for (Integer parentClusterMember:parentsClusterMembers) {
 //						System.out.println("sending out- src: "+ this.ID + " dest: " + parentClusterMember + " cID: " + this.myCluster);
+
+//						System.out.println("from " + this.ID + " in: " + myClustersID+ " to " + parentClusterMember + " in c: " + this.toplogy.getParent(myClustersID));
 						int delay = NetworkPacket.getDelayInMilliSeconds(this.config.delayDistType, this.config);
-						this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET));
+						this.nodes.get(parentClusterMember).recievePacket(new NetworkPacket(currentTime + delay, PacketType.INPUTPACKET, config.nodeInitialDataSize, dataRecievedInThisCycleForThisNode, this.ID, parentClusterMember));
 					}
-				}			
-								
+				}
+
 				//remove the packets in the recieved queue
+				dataRecievedInThisCycleForThisNode = 0;
 				this.packetsReceived.clear();
 			}
 		}
@@ -116,23 +123,61 @@ public class Node {
 	}
 	
 
-	public void schedlueIncomingPackets(int currentTime, int endOfCycle) {
+	public boolean schedlueIncomingPackets(int currentTime, int endOfCycle, int roundNumber) {
 		
 		/*
 		 *the goal of this function is to schedule the packets until the end of cycle and 
 		 */
-		while(!packetQToBeRecieved.isEmpty()) {
-			NetworkPacket packet = packetQToBeRecieved.first();
+		//TODO add the effect of size of the packets that are being recieved
+
+		int countOfNumberOfNodesFromWhichDataWasRecieved = 0;
+
+		float sumOfNewLoadFromLowerCluster = 0;
+		float sumOfOldLoadFromLowerCluster = 0 ;
+		float sumOfTotalDataRecieved = 0;
+
+		int startTimeOfPackets = currentTime - config.lengthOfRound;
+
+		while(!this.packetQToBeRecieved.isEmpty()) {
+
+			NetworkPacket packet = this.packetQToBeRecieved.getFirst(); //first();
 //			System.out.println("node: "+ this.ID + " time: " + packet.startTime + " endOfCycle: " + currentTime);
-			if (packet.startTime < endOfCycle) {
+			if (packet.startTime < currentTime) {
+				//find smallest start time
+				startTimeOfPackets = Math.max(packet.startTime, startTimeOfPackets);
+				//sum packets
+				sumOfNewLoadFromLowerCluster += packet.newLoadData;
+				sumOfOldLoadFromLowerCluster = Math.max(packet.oldLoadData, sumOfOldLoadFromLowerCluster);
+
+				sumOfTotalDataRecieved += packet.newLoadData + packet.oldLoadData ;
 				packetsReceived.add(packet);
-				packetQToBeRecieved.remove(packet);
+				this.packetQToBeRecieved.remove(packet);
+				countOfNumberOfNodesFromWhichDataWasRecieved++;
 			}
-			else {
-				break;
-			}
-				
+
 		}
-   	}
+
+		//this is the amount of data that goes out
+		dataRecievedInThisCycleForThisNode = sumOfNewLoadFromLowerCluster + config.nArry * sumOfOldLoadFromLowerCluster ;
+
+		//this is the actual data that comes in throufh links
+		float requiredTime = sumOfTotalDataRecieved / config.bandWidth;
+
+
+//		if(dataRecievedInThisCycleForThisNode != 0)
+//			System.out.println("layer: " + this.myLayer + " cluster: " +this.myCluster +" d: " + sumOfTotalDataRecieved + " round : " + roundNumber + " c: " + countOfNumberOfNodesFromWhichDataWasRecieved);
+
+		//this is the round length - start of packets
+		int timeForPackets = currentTime - startTimeOfPackets;
+		if (timeForPackets < 0)
+			timeForPackets = 0;
+		if(startTimeOfPackets != 0 && startTimeOfPackets != -500000){
+			int h = 9;
+		}
+		if (requiredTime <= timeForPackets)
+			return true;
+		else
+			return false;
+	}
 	
 }

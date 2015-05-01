@@ -44,7 +44,7 @@ public class Node {
 		this.sizeOfReceivedData = config.nodeInitialDataSize;
 	}
 	
-	public boolean protocol(int currentTime, int roundNumber){
+	public boolean protocol(long currentTime, int roundNumber){
 		/*
 		 * This runs in every round. must send all the messages 
 		 * and also take care of all the time related issues.
@@ -123,7 +123,7 @@ public class Node {
 	}
 	
 
-	public boolean schedlueIncomingPackets(int currentTime, int endOfCycle, int roundNumber) {
+	public boolean schedlueIncomingPackets(long currentTime, long endOfCycle, long roundNumber) {
 		
 		/*
 		 *the goal of this function is to schedule the packets until the end of cycle and 
@@ -136,7 +136,7 @@ public class Node {
 		float sumOfOldLoadFromLowerCluster = 0 ;
 		float sumOfTotalDataRecieved = 0;
 
-		int startTimeOfPackets = currentTime - config.lengthOfRound;
+		long startTimeOfPackets = currentTime - config.lengthOfRound;
 
 		while(!this.packetQToBeRecieved.isEmpty()) {
 
@@ -168,7 +168,7 @@ public class Node {
 //			System.out.println("layer: " + this.myLayer + " cluster: " +this.myCluster +" d: " + sumOfTotalDataRecieved + " round : " + roundNumber + " c: " + countOfNumberOfNodesFromWhichDataWasRecieved);
 
 		//this is the round length - start of packets
-		int timeForPackets = currentTime - startTimeOfPackets;
+		long timeForPackets = currentTime - startTimeOfPackets;
 		if (timeForPackets < 0)
 			timeForPackets = 0;
 		if(startTimeOfPackets != 0 && startTimeOfPackets != -500000){

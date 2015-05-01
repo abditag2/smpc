@@ -60,8 +60,8 @@ public class Simulator {
 
 		//returns true if the time was enough
 
-		int currentTime = 0;
-		int endOfCycle = currentTime + this.config.lengthOfRound;
+		long currentTime = 0;
+		long endOfCycle = currentTime + this.config.lengthOfRound;
 
 		HashMap<Integer, FailedNode> failedNodes = new HashMap<Integer, FailedNode>();
 		
@@ -190,7 +190,7 @@ public class Simulator {
 	}
 
 	public ArrayList<FailedNode> getFailedNodes(int totalNumberOfNodes,
-		int failureRate, int timeLengthMilliSeconds) {
+		int failureRate, long timeLengthMilliSeconds) {
 		ArrayList<FailedNode> results = new ArrayList<>();
 		//this is the average of the numbers that should fail in this round
 		double failedNumberAvg= (double)totalNumberOfNodes/(double)failureRate * ((double)timeLengthMilliSeconds/(double)60000) ;
@@ -246,18 +246,17 @@ public class Simulator {
 			// do experiment on failre and etc
 			try{
 				PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
-
-				for(int bandWidth = 10 ; bandWidth < 1000 ; bandWidth = bandWidth + 100){
-					for(int delay = 10 ; delay < 1000 ; delay = delay + 100){
-						for(int dataSize = 1 ; dataSize < 10000 ; dataSize = dataSize = dataSize + 100){
-
-							int currentLengthBeforeChange = 0;
-							int acceptableTimeError = 30;
+				float bandWidth = 100;
+//				for(int bandWidth = 10 ; bandWidth < 1000 ; bandWidth = bandWidth + 100){
+					for(float dataSize = 1 ; dataSize < 10000 ; dataSize = dataSize + 1000){
+						for(long delay = 1 ; delay < 1000 ; delay = delay + 100){
+							long currentLengthBeforeChange = 0;
+							long acceptableTimeError = 50;
 							boolean timeEnough = false;
-							int lastLength = 0;
-							int minLength = 0;
-							int maxLength = 1000000;
-							int currentLength = (maxLength + minLength)/2;
+							long lastLength = 0;
+							long minLength = 0;
+							long maxLength = 1000000000;
+							long currentLength = (maxLength + minLength)/2;
 
 							while(true)
 							{
@@ -269,7 +268,8 @@ public class Simulator {
 								//settings that do not change
 								config.delayDistType = NetworkPacket.RTTDelayDistributionType.CONSTANT;
 								config.failureRate = Integer.MAX_VALUE;
-								config.numberOfnodes = 100000;
+								config.numberOfnodes = 10000;
+								config.numberOfLayersTopology = 9;
 
 								//settings that change
 								config.nodeInitialDataSize = dataSize;
@@ -294,13 +294,15 @@ public class Simulator {
 								}
 								else if (timeEnough){
 									if(Math.abs(currentLengthBeforeChange - lastLength)< acceptableTimeError){
-										return;
+										writer.println(bandWidth + " " + delay + " " + dataSize + " " + currentLength);
+										writer.flush();
+										break;
 									}else{
 										maxLength = currentLength;
 										currentLength = (currentLength + minLength) / 2;
 									}
 								}
-							}
+//							}
 						}
 					}
 				}
@@ -316,7 +318,7 @@ public class Simulator {
 	}
 	
 	public class FailedNode{
-		int timeLeftToRecoverMilliseconds;
+		long timeLeftToRecoverMilliseconds;
 		int ID;
 		public FailedNode(int roundsLeft, int ID) {
 			this.ID = ID;

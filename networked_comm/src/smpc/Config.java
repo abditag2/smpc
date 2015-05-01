@@ -26,10 +26,10 @@ public class Config {
 	public int deviation;
 
 	//communication over head for delay
-	public int constantDelay;
+	public long constantDelay;
 
 	// waitingTime for the nodes in each round
-	public int lengthOfRound;
+	public long lengthOfRound;
 
 	// ratio of corrupted nodes to total number of nodes
 	public int percentOfCorruptedNodes;

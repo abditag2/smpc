@@ -5,7 +5,7 @@ import java.util.Random;
 import smpc.Config;
 
 public class NetworkPacket implements Comparable {
-	int startTime;
+	long startTime;
 	int source;
 	int destination;
 	float newLoadData;
@@ -13,7 +13,7 @@ public class NetworkPacket implements Comparable {
 	PacketType packetType;
 
 
-	public NetworkPacket(int startTime, PacketType packetType, float newLoadData, float oldLoadData, int source, int destination) {
+	public NetworkPacket(long startTime, PacketType packetType, float newLoadData, float oldLoadData, int source, int destination) {
 		this.startTime = startTime;
 		this.packetType = packetType;
 		this.newLoadData = newLoadData;
@@ -46,7 +46,7 @@ public class NetworkPacket implements Comparable {
 	@Override
 	public int compareTo(Object o) {
 		NetworkPacket anotherPacket = (NetworkPacket) o ;
-		return anotherPacket.startTime - this.startTime;
+		return (int) (anotherPacket.startTime - this.startTime);
 	}
 
 	public enum PacketType{

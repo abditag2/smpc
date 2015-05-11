@@ -5,19 +5,21 @@ import java.util.Random;
 import smpc.Config;
 
 public class NetworkPacket implements Comparable {
-	long startTime;
+	float startTime;
 	int source;
 	int destination;
 	float newLoadData;
 	float oldLoadData;
+	float overHead;
 	PacketType packetType;
 
 
-	public NetworkPacket(long startTime, PacketType packetType, float newLoadData, float oldLoadData, int source, int destination) {
+	public NetworkPacket(float startTime, PacketType packetType, float newLoadData, float oldLoadData, float overHead, int source, int destination) {
 		this.startTime = startTime;
 		this.packetType = packetType;
 		this.newLoadData = newLoadData;
 		this.oldLoadData = oldLoadData;
+		this.overHead = overHead;
 		this.source = source;
 		this.destination = destination;
 	}

@@ -18,18 +18,18 @@ public class Config {
 	public RTTDelayDistributionType delayDistType;
 	// RTT parameters needs to be defined. The following are for the linear
 	// distribution in milliseconds
-	public int RTTmin;
-	public int RTTmax;
+	public float RTTmin;
+	public float RTTmax;
 	
 	//RTTParams for GAUSSIAN distribution
-	public int avg;
-	public int deviation;
+	public float avg;
+	public float deviation;
 
 	//communication over head for delay
-	public long constantDelay;
+	public float constantDelay;
 
 	// waitingTime for the nodes in each round
-	public long lengthOfRound;
+	public float lengthOfRound;
 
 	// ratio of corrupted nodes to total number of nodes
 	public int percentOfCorruptedNodes;
@@ -39,7 +39,7 @@ public class Config {
 	public int failureRate;
 	
 	//time that it takes for a node to recover in Milliseconds
-	public int recoveryTime;	
+	public float recoveryTime;
 	
 	//Size of the final cluster that performs the calculations
 	public int lastClusterSize;
@@ -55,6 +55,13 @@ public class Config {
 
 	//Node initial data size
 	public float nodeInitialDataSize;
+
+	//TCP overhead
+	public float TCP_PACKET_SIZE = 1460;
+	public float TCP_PACKET_OVERHEAD = 40;
+
+	//Time to run online Phase with current number of nodes
+	public float online_phase_execution_time;
 	
 	public Config() {
 		/*

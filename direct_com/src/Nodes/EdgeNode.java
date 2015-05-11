@@ -8,7 +8,7 @@ import Abstracts.Packet;
  */
 public class EdgeNode extends Node{
 
-    public EdgeNode(int dataSize){
+    public EdgeNode(long dataSize){
         this.dataSize = dataSize;
     }
 }

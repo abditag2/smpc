@@ -19,7 +19,7 @@ public class Utils {
         return Config.COMMUNICATION_SETUP_OVERHEAD;
     }
 
-    public static int GetDataSizeForNode(int nodeID){
+    public static long GetDataSizeForNode(int nodeID){
         return Config.AVG_DATA_SIZE;
     }
 

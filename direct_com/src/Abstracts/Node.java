@@ -5,6 +5,6 @@ package Abstracts;
  */
 public class Node{
 
-    public int dataSize;
+    public long dataSize;
 
 }

@@ -1,15 +1,16 @@
 package smpc;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.*;
 
-import org.omg.CORBA.INTERNAL;
 import smpc.Abstracts.*;
+import smpc.abstractlibrary.Parameters;
+import smpc.library.OnlinePhaseSimulation;
+import smpc.voting.votingSPDZ;
+
 import java.io.PrintWriter;
 
-public class Simulator {
+public class CommunicationTreeSimulator {
 
 	public ArrayList<Node> nodes;
 	public Topology topology;
@@ -18,7 +19,7 @@ public class Simulator {
 	public boolean searchForMinimumRoundLength = false;
 	
 	
-	public Simulator(Config config) {
+	public CommunicationTreeSimulator(Config config) {
 		this.config = config;
 	}
 	
@@ -60,8 +61,8 @@ public class Simulator {
 
 		//returns true if the time was enough
 
-		long currentTime = 0;
-		long endOfCycle = currentTime + this.config.lengthOfRound;
+		float currentTime = 0;
+		float endOfCycle = currentTime + this.config.lengthOfRound;
 
 		HashMap<Integer, FailedNode> failedNodes = new HashMap<Integer, FailedNode>();
 		
@@ -78,12 +79,13 @@ public class Simulator {
 			//for all the nodes schedule their incoming packets
 			boolean didAllTheNodesHadEnoughTimeToRecieveTheirPackets = true;
 			for (Node node : nodes) {
-				if(!node.failed)
+				if(!node.failed) {
 					didAllTheNodesHadEnoughTimeToRecieveTheirPackets &= node.schedlueIncomingPackets(currentTime, endOfCycle, roundNumber);
+				}
 			}
 
 			if(this.searchForMinimumRoundLength && !didAllTheNodesHadEnoughTimeToRecieveTheirPackets){
-				//some nodes did not have enough time to deliver all their data. So, break simulation and increase the round duration time.
+				//some nodes did not have enough time to deliver all their data. So, break onlinePhaseSimulation and increase the round duration time.
 				return false;
 			}
 
@@ -190,7 +192,7 @@ public class Simulator {
 	}
 
 	public ArrayList<FailedNode> getFailedNodes(int totalNumberOfNodes,
-		int failureRate, long timeLengthMilliSeconds) {
+		int failureRate, float timeLengthMilliSeconds) {
 		ArrayList<FailedNode> results = new ArrayList<>();
 		//this is the average of the numbers that should fail in this round
 		double failedNumberAvg= (double)totalNumberOfNodes/(double)failureRate * ((double)timeLengthMilliSeconds/(double)60000) ;
@@ -221,15 +223,33 @@ public class Simulator {
 
 	public static void main(String[] args) {
 		PrintStream out = null;
-		
-//		try {
-//			out = new PrintStream(new FileOutputStream("output.txt"));
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//		System.setOut(out);
+
+		/*
+		Here we run online phase once to measure how long it takes to execute it for one cluser and then later add that to the execution time
+		 */
+		Parameters.count = 0 ;
+
+		System.out.println("OnlinePhaseSimulation Starting");
+		OnlinePhaseSimulation onlinePhaseSimulation = new OnlinePhaseSimulation();
+
+		double timeToSchedule = 0 ;
+
+
+		onlinePhaseSimulation.schedule(new votingSPDZ(onlinePhaseSimulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+		//onlinePhaseSimulation.schedule(new votingSMPC(onlinePhaseSimulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+
+
+		onlinePhaseSimulation.doAllEvents() ;
+
+		System.out.println("OnlinePhaseSimulation Ends");
+		System.out.println("Recieves are " + Parameters.count);
+		System.out.println("Execution Time: " + onlinePhaseSimulation.time);
+
+		float online_phase_execution_time = (float) onlinePhaseSimulation.time;
+
+		/*
+		Start the communication network onlinePhaseSimulation with the parameter measured above
+		 */
 
 		boolean searchForMinimumRoundLength  = true ;
 
@@ -237,7 +257,8 @@ public class Simulator {
 		if (searchForMinimumRoundLength == false){
 			Config config = new Config();
 			config.lengthOfRound = 30000;
-			Simulator sim = new Simulator(config);
+			config.online_phase_execution_time = online_phase_execution_time;
+			CommunicationTreeSimulator sim = new CommunicationTreeSimulator(config);
 			sim.initialize();
 			sim.simulate();
 		}
@@ -246,23 +267,29 @@ public class Simulator {
 			// do experiment on failre and etc
 			try{
 				PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
-				float bandWidth = 100;
-//				for(int bandWidth = 10 ; bandWidth < 1000 ; bandWidth = bandWidth + 100){
-					for(float dataSize = 1 ; dataSize < 10000 ; dataSize = dataSize + 1000){
-						for(long delay = 1 ; delay < 1000 ; delay = delay + 100){
-							long currentLengthBeforeChange = 0;
-							long acceptableTimeError = 50;
+//				float bandWidth = 100;
+				//bw is byte per 10 ms
+				for(int bandWidth = 1 ; bandWidth < 2000000 ; bandWidth = bandWidth * 2){
+//				{int bandWidth = 1 ;
+					for(float dataSize = 1 ; dataSize < 1000000000 ; dataSize = dataSize *  4){
+//					{float dataSize = 1024;
+						//delay is per 10 ms
+						for(float delay = 1 ; delay < 20 ; delay = delay + 2){
+//						{long delay = 7;
+							float currentLengthBeforeChange = 0;
+							float acceptableTimeError = 100;
 							boolean timeEnough = false;
-							long lastLength = 0;
-							long minLength = 0;
-							long maxLength = 1000000000;
-							long currentLength = (maxLength + minLength)/2;
+							float LENGTH_RANGE = (float)100* (float)1000000000;
+							float lastLength = 0;
+							float minLength = 0;
+							float maxLength = LENGTH_RANGE;
+							float currentLength = (maxLength + minLength)/2;
 
 							while(true)
 							{
 								System.out.println("length: " + currentLength);
 
-								//set simulation configuration
+								//set onlinePhaseSimulation configuration
 								Config config = new Config();
 
 								//settings that do not change
@@ -278,7 +305,7 @@ public class Simulator {
 
 								config.lengthOfRound = currentLength ;
 
-								Simulator sim = new Simulator(config);
+								CommunicationTreeSimulator sim = new CommunicationTreeSimulator(config);
 								sim.searchForMinimumRoundLength = true;
 								sim.initialize();
 								timeEnough = sim.simulate();
@@ -302,7 +329,16 @@ public class Simulator {
 										currentLength = (currentLength + minLength) / 2;
 									}
 								}
-//							}
+
+								if(currentLength == currentLengthBeforeChange){
+									currentLength++;
+								}
+								if(currentLength >= LENGTH_RANGE){
+									writer.println(bandWidth + " " + delay + " " + dataSize + " " + LENGTH_RANGE);
+									writer.flush();
+									break;
+								}
+							}
 						}
 					}
 				}
@@ -318,9 +354,9 @@ public class Simulator {
 	}
 	
 	public class FailedNode{
-		long timeLeftToRecoverMilliseconds;
+		float timeLeftToRecoverMilliseconds;
 		int ID;
-		public FailedNode(int roundsLeft, int ID) {
+		public FailedNode(float roundsLeft, int ID) {
 			this.ID = ID;
 			this.timeLeftToRecoverMilliseconds = roundsLeft;
 		}

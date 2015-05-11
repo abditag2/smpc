@@ -8,10 +8,10 @@
 //
 //import org.junit.*;
 //
-//import smpc.Simulator.*;
+//import smpc.CommunicationTreeSimulator.*;
 //import smpc.Topology;
 //import smpc.Config;
-//import smpc.Simulator;
+//import smpc.CommunicationTreeSimulator;
 //import smpc.Abstracts.*;
 //import smpc.Abstracts.NetworkPacket.PacketType;
 //
@@ -43,7 +43,7 @@
 //
 //    @Test
 //    public void testGetFailedNodes(){
-//    	Simulator sim = new Simulator(new Config());
+//    	CommunicationTreeSimulator sim = new CommunicationTreeSimulator(new Config());
 //    	sim.initialize();
 //    	List<Integer> randNumbers = sim.getMRandomNumbersOutOfN(10, 1000);
 //    	assert(randNumbers.size() == 10);
@@ -55,7 +55,7 @@
 //
 //    @Test
 //    public void testFailedNodeIDs() {
-//    	Simulator sim = new Simulator(new Config());
+//    	CommunicationTreeSimulator sim = new CommunicationTreeSimulator(new Config());
 //    	ArrayList<FailedNode> failedNodes = sim.getFailedNodes(100000 ,1000, 60);
 //
 //    	//just manually check this outputs :)
@@ -65,7 +65,7 @@
 //    	Config config = new Config();
 //    	config.nArry = 3;
 //    	config.numberOfLayersTopology  = 10;
-//    	Simulator sim = new Simulator(config);
+//    	CommunicationTreeSimulator sim = new CommunicationTreeSimulator(config);
 //
 //    	int layer = sim.getMyLayerNumber(12, config);
 //

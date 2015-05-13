@@ -4,6 +4,7 @@ import smpc.Parameters;
 import smpc.abstractlibrary.Event;
 import smpc.abstractlibrary.Simulation;
 import smpc.events.BroadCast;
+import smpc.events.Computation;
 
 /**
  * Created by tanish on 5/13/15.
@@ -36,6 +37,11 @@ public class ProtCommitOpen extends Event {
          */
 
         simulation.schedule( new BroadCast(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
+
+        for(int i = 0 ; i < Parameters.getNumberOfParties() ; i ++ ){
+            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.HASH_GENERATION));
+            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.HASH_GENERATION));
+        }
 
 
         return false;

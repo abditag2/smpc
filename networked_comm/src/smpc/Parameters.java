@@ -28,6 +28,7 @@ public class Parameters {
 	static public int SHE_ENCRYPT_TIME = 1;
 	static public int SHE_DECRYPT_TIME = 1;
 	static public int AES_ENCRYPT_TIME = 1;
+	static public int HASH_GENERATION_TIME = 1;
 
 	static public int COMPUTATION_COST1  = 2;
 	static public int RANDOM_COIN_GENERATION_LOCAL = 1;
@@ -80,6 +81,9 @@ public class Parameters {
 			case AES_ENCRYPT:
 				duration = AES_ENCRYPT_TIME;
 				break;
+			case HASH_GENERATION:
+				duration = HASH_GENERATION_TIME;
+				break;
 
 		}
 
@@ -97,7 +101,9 @@ public class Parameters {
 		SHE_ADD,
 		SEND,
 		RECIEVE,
-		AES_ENCRYPT
+		AES_ENCRYPT,
+		HASH_GENERATION
+
 	}
 
 	static public double getNetworkDelay(){

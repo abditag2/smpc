@@ -26,6 +26,8 @@ public class Parameters {
 	static public int SEND_TIME  = 1;
 	static public int RECEIVE_TIME = 2;
 	static public int SHE_ENCRYPT_TIME = 1;
+	static public int SHE_DECRYPT_TIME = 1;
+	static public int AES_ENCRYPT_TIME = 1;
 
 	static public int COMPUTATION_COST1  = 2;
 	static public int RANDOM_COIN_GENERATION_LOCAL = 1;
@@ -46,6 +48,8 @@ public class Parameters {
 	 */
 
 	static public boolean NEW_CIPHER_TEXT = true;
+	//TODO verify this is correct
+	static public int N_CIPHER = 10;
 
 	static public double getDuration(ComputationType computationType){
 
@@ -70,6 +74,13 @@ public class Parameters {
 			case SHE_ENCRYPT:
 				duration = SHE_ENCRYPT_TIME;
 				break;
+			case SHE_DECRYPT:
+				duration = SHE_DECRYPT_TIME;
+				break;
+			case AES_ENCRYPT:
+				duration = AES_ENCRYPT_TIME;
+				break;
+
 		}
 
 		return (double) duration;
@@ -81,15 +92,16 @@ public class Parameters {
 		RANDOM_GEN,
 		COMMIT_COMPUTATION,
 		SHE_ENCRYPT,
+		SHE_DECRYPT,
 		SHE_MULTIPLY,
 		SHE_ADD,
 		SEND,
-		RECIEVE
+		RECIEVE,
+		AES_ENCRYPT
 	}
 
 	static public double getNetworkDelay(){
-		return NETWORK_DELAY ; 
-		//TODO we must change this or randomize this
+		return NETWORK_DELAY ;
 	}
 	
 	static public int getNumberOfParties(){

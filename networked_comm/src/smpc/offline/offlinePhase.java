@@ -5,8 +5,8 @@ import smpc.Parameters;
 import smpc.abstractlibrary.Simulation;
 import smpc.events.BroadCast;
 import smpc.events.Computation;
+import smpc.offlineEvents.ProtEncCommitCommit;
 import smpc.offlineEvents.Reshare;
-import smpc.offlineEvents.ProtEncCommit;
 
 
 public class offlinePhase extends Event {
@@ -66,10 +66,13 @@ public class offlinePhase extends Event {
 
         simulation.doAllEvents();
 
+        //TODO figure out what is nm and m
+
         /**
          * Triples(nm)
          For k in {1,..., ceil(4.nm/m)}
-         Run ProtEncCommit 2 times
+             Run ProtEncCommitCommit 2 times
+
          All players call SHE.Add() 2n times
          All parties call SHE.Multiply()
          Call Reshare(~,NewCiphertext)
@@ -78,7 +81,7 @@ public class offlinePhase extends Event {
          */
 
         for(int k = 0 ; k < Parameters.getNumberOfParties() ; k++){
-            simulation.schedule(new ProtEncCommit(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
+            simulation.schedule(new ProtEncCommitCommit(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
         }
         simulation.doAllEvents();
 

@@ -37,18 +37,20 @@ public class Reshare extends Event {
          *
          */
 
-        simulation.schedule(new ProtEncCommit(simulation, startTime, hostID, 0, Parameters.getNumberOfParties()));
+        simulation.schedule(new ProtEncCommitCommit(simulation, startTime, hostID, 0, Parameters.getNumberOfParties()));
         for (int i = 0; i < Parameters.getNumberOfParties() ; i++)
         {
             simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.SHE_ADD));
         }
 
-        simulation.schedule( new DistDec(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
+        simulation.schedule(new DistDec(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
 
+        simulation.doAllEvents();
         if(Parameters.NEW_CIPHER_TEXT == true){
             simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.SHE_ADD));
             simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.SHE_ENCRYPT));
         }
+
         return false;
     }
 }

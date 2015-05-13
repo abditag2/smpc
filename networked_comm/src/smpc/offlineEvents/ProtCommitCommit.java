@@ -4,11 +4,11 @@ import smpc.abstractlibrary.Event;
 import smpc.abstractlibrary.Simulation;
 
 /**
- * Created by tanish on 5/12/15.
+ * Created by tanish on 5/13/15.
  */
-public class ProtEncCommit extends Event{
+public class ProtCommitCommit extends Event{
 
-    public ProtEncCommit(Simulation simulation,  double startTime , int hostID, int start, int end)
+    public ProtCommitCommit(Simulation simulation, double startTime, int hostID, int start, int end)
     {
         this.simulation = simulation;
         this.startTime = startTime ;
@@ -22,7 +22,8 @@ public class ProtEncCommit extends Event{
 
     @Override
     public boolean execute() {
-        //TODO fill these events
+
+        //TODO
         return false;
     }
 }

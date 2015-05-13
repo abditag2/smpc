@@ -1,14 +1,15 @@
 package smpc.events;
 
 import smpc.abstractlibrary.Event;
+import smpc.abstractlibrary.Simulation;
 import smpc.library.OnlinePhaseSimulation;
 
 public class OpenCommit extends Event {
 
 	
 	int start, end ; 
-	public OpenCommit (OnlinePhaseSimulation onlinePhaseSimulation, double startTime, int hostID, int start, int end){
-		this.onlinePhaseSimulation = onlinePhaseSimulation;
+	public OpenCommit (Simulation simulation, double startTime, int hostID, int start, int end){
+		this.simulation = simulation;
 		this.startTime = startTime ; 
 		this.hostID = hostID ;
 		
@@ -24,7 +25,7 @@ public class OpenCommit extends Event {
 		
 		for (int i = start; i < end; i++) 
 		{
-			onlinePhaseSimulation.schedule(new Send(onlinePhaseSimulation, startTime, hostID, i)) ;
+			simulation.schedule(new Send(simulation, startTime, hostID, i)) ;
 		}
 		return false;
 	}

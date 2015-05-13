@@ -1,7 +1,8 @@
 package smpc.library;
 
-import smpc.abstractlibrary.Parameters;
+import smpc.Parameters;
 import smpc.abstractlibrary.Event;
+import smpc.communicationTree.Node;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ public class ListQueue {
 			event.execute();
 			return ; 
 		}
-		
+
 		//real Event on a node!
 		if ( nodeInfo.get(event.getHostID()).getFinishTime() < event.getStartTime() ){
 			nodeInfo.get(event.getHostID()).setFinishTime(event.getFinishingTime());
@@ -44,7 +45,7 @@ public class ListQueue {
 			nodeInfo.get(event.getHostID()).setFinishTime(event.getFinishingTime());
 		}
 		
-//		System.out.println("schedule type: " + event.type  +" st: " + event.getStartTime()  + " ft: " + event.getFinishingTime() + " hostID: " + event.getHostID());
+		System.out.println("schedule type: " + event.type  +" st: " + event.getStartTime()  + " ft: " + event.getFinishingTime() + " hostID: " + event.getHostID());
 		
 		q.add(event);
 
@@ -60,6 +61,16 @@ public class ListQueue {
 
 	public int size(){
 		return q.size();
+	}
+
+	public double getLastFinishingTimeForAllNodes(){
+		double time = Double.MIN_VALUE;
+
+		for(NodeInfo node: nodeInfo){
+			time = Math.max(node.getFinishTime(), time);
+		}
+
+		return time;
 	}
 
 }

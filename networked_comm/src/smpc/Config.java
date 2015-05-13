@@ -1,6 +1,6 @@
 package smpc;
 
-import smpc.Abstracts.NetworkPacket.RTTDelayDistributionType;
+import smpc.communicationTree.NetworkPacket.RTTDelayDistributionType;
 
 public class Config {
 
@@ -96,5 +96,6 @@ public class Config {
 		this.nodeInitialDataSize = 100;
 
 		this.constantDelay = 0;
+		this.online_phase_execution_time = 0;
 	}
 }

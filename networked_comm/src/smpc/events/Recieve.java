@@ -1,19 +1,19 @@
 package smpc.events;
 
-import smpc.abstractlibrary.Parameters;
+import smpc.Parameters;
 import smpc.abstractlibrary.Event;
-import smpc.library.OnlinePhaseSimulation;
+import smpc.abstractlibrary.Simulation;
 
 public class Recieve extends Event {
 	
 	
 	
-	public Recieve (OnlinePhaseSimulation onlinePhaseSimulation, double startTime, int hostID){
-		this.onlinePhaseSimulation = onlinePhaseSimulation;
+	public Recieve (Simulation simulation, double startTime, int hostID){
+		this.simulation = simulation;
 		this.startTime = startTime ; 
 		this.hostID = hostID ;
 		
-		this.duration = 20.0 ;
+		this.duration = Parameters.getDuration(Parameters.ComputationType.RECIEVE) ;
 		this.type = "Recieve";
 	}
 	

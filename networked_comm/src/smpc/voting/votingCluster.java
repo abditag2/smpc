@@ -1,16 +1,15 @@
 package smpc.voting;
 
 import smpc.abstractlibrary.Event;
-import smpc.abstractlibrary.Parameters;
+import smpc.Parameters;
+import smpc.abstractlibrary.Simulation;
 import smpc.events.Computation;
-import smpc.events.InputPhase;
-import smpc.library.OnlinePhaseSimulation;
 
 public class votingCluster extends Event{
 
-	public  votingCluster(OnlinePhaseSimulation onlinePhaseSimulation, double startTime, int hostID ,  int start, int end)
+	public  votingCluster(Simulation simulation, double startTime, int hostID ,  int start, int end)
 	{
-		this.onlinePhaseSimulation = onlinePhaseSimulation;
+		this.simulation = simulation;
 		this.startTime = startTime ; 
 		this.hostID = hostID ;
 		
@@ -24,14 +23,14 @@ public class votingCluster extends Event{
 	
 	@Override
 	public boolean execute() {
-			
-		onlinePhaseSimulation.schedule(new InputPhase(onlinePhaseSimulation, startTime, Parameters.VIRTUAL_HOST, start, end) );
-		System.out.println("input Phase finished!");
+
+
+		//TODO Make sure voting is right
 		for (int i = start ; i < end; i++ ) 
 		{
 			for(int j = start ; j < end ; j++) {
-				onlinePhaseSimulation.schedule(new Computation(onlinePhaseSimulation, startTime, i, Parameters.ADDITION_TIME)) ;
-				onlinePhaseSimulation.schedule(new Computation(onlinePhaseSimulation, startTime, i, Parameters.ADDITION_TIME)) ;
+				simulation.schedule(new Computation(simulation, startTime, i, Parameters.ComputationType.ADDITION)) ;
+				simulation.schedule(new Computation(simulation, startTime, i, Parameters.ComputationType.ADDITION)) ;
 			}
 		}
 		

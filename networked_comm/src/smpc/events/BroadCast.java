@@ -1,6 +1,7 @@
 package smpc.events;
 
 import smpc.abstractlibrary.Event;
+import smpc.abstractlibrary.Simulation;
 import smpc.library.OnlinePhaseSimulation;
 
 public class BroadCast extends Event {
@@ -8,15 +9,15 @@ public class BroadCast extends Event {
 
 	int start, end ; 
 
-	public BroadCast(OnlinePhaseSimulation onlinePhaseSimulation,  double startTime , int hostID, int start, int end)
+	public BroadCast(Simulation simulation,  double startTime , int hostID, int start, int end)
 	{
 	
-		 this.onlinePhaseSimulation = onlinePhaseSimulation;
+		 this.simulation = simulation;
 		 this.startTime = startTime ; 
 		 this.hostID  = hostID; 
 		 
-		 this.duration = 10.0 ; 
-		 this.type = "Share";
+		 this.duration = 0.0 ;
+		 this.type = "BroadCast";
 		 this.start = start ; 
 		 this.end = end ; 
 	}
@@ -30,16 +31,14 @@ public class BroadCast extends Event {
 
 //		System.out.println("Share Started at" + this.startTime + " and finished at:" + this.getFinishingTime() + "on host: "  + this.hostID);
 
-		
 		for (int i = start ; i < end  ; i++)
 		{
-				Send sendEvent = new Send(onlinePhaseSimulation, time  , hostID, i);
-				onlinePhaseSimulation.schedule(sendEvent);
-				time = sendEvent.getFinishingTime();
+//			System.out.println("bc send time:" + time);
+			int destID = (i + hostID) % end;
+			Send sendEvent = new Send(simulation, time  , hostID, destID);
+			simulation.schedule(sendEvent);
+			time = sendEvent.getFinishingTime();
 		}
-
-
-		
 		return false;
 	}
 

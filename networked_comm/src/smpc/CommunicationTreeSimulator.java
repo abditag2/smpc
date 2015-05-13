@@ -3,9 +3,10 @@ package smpc;
 import java.io.PrintStream;
 import java.util.*;
 
-import smpc.Abstracts.*;
-import smpc.abstractlibrary.Parameters;
+import smpc.communicationTree.*;
 import smpc.library.OnlinePhaseSimulation;
+import smpc.library.OfflinePhaseSimulation;
+import smpc.offline.offlinePhase;
 import smpc.voting.votingSPDZ;
 
 import java.io.PrintWriter;
@@ -85,7 +86,7 @@ public class CommunicationTreeSimulator {
 			}
 
 			if(this.searchForMinimumRoundLength && !didAllTheNodesHadEnoughTimeToRecieveTheirPackets){
-				//some nodes did not have enough time to deliver all their data. So, break onlinePhaseSimulation and increase the round duration time.
+				//some nodes did not have enough time to deliver all their data. So, break simulation and increase the round duration time.
 				return false;
 			}
 
@@ -221,12 +222,7 @@ public class CommunicationTreeSimulator {
 	}
 
 
-	public static void main(String[] args) {
-		PrintStream out = null;
-
-		/*
-		Here we run online phase once to measure how long it takes to execute it for one cluser and then later add that to the execution time
-		 */
+	static private float runOnlinePhaseSim(){
 		Parameters.count = 0 ;
 
 		System.out.println("OnlinePhaseSimulation Starting");
@@ -236,123 +232,176 @@ public class CommunicationTreeSimulator {
 
 
 		onlinePhaseSimulation.schedule(new votingSPDZ(onlinePhaseSimulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
-		//onlinePhaseSimulation.schedule(new votingSMPC(onlinePhaseSimulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+		//simulation.schedule(new votingSMPC(simulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
 
 
 		onlinePhaseSimulation.doAllEvents() ;
 
+		Config config = new Config();
+
+		Parameters.NUMBER_OF_PARTIES = config.numberOfnodes;
+
 		System.out.println("OnlinePhaseSimulation Ends");
-		System.out.println("Recieves are " + Parameters.count);
-		System.out.println("Execution Time: " + onlinePhaseSimulation.time);
+		System.out.println("OnlinePhaseSimulation Recieves are " + Parameters.count);
+		System.out.println("OnlinePhaseSimulation Execution Time: " + onlinePhaseSimulation.time);
 
-		float online_phase_execution_time = (float) onlinePhaseSimulation.time;
+		return (float) onlinePhaseSimulation.time;
+	}
 
-		/*
-		Start the communication network onlinePhaseSimulation with the parameter measured above
-		 */
+	static private float simulateOfflinePhase(){
+		Parameters.count = 0 ;
 
-		boolean searchForMinimumRoundLength  = true ;
+		System.out.println("offlinePhaseSimulation Starting");
+		OfflinePhaseSimulation offlinePhaseSimulation = new OfflinePhaseSimulation();
 
-		// search for a minimum round duration time that all the packets can be delivered
-		if (searchForMinimumRoundLength == false){
-			Config config = new Config();
-			config.lengthOfRound = 30000;
-			config.online_phase_execution_time = online_phase_execution_time;
-			CommunicationTreeSimulator sim = new CommunicationTreeSimulator(config);
-			sim.initialize();
-			sim.simulate();
-		}
+		double timeToSchedule = 0 ;
 
-		else if (searchForMinimumRoundLength == true){
-			// do experiment on failre and etc
-			try{
-				PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
-//				float bandWidth = 100;
-				//bw is byte per 10 ms
-				for(int bandWidth = 1 ; bandWidth < 2000000 ; bandWidth = bandWidth * 2){
+
+		offlinePhaseSimulation.schedule(new offlinePhase(offlinePhaseSimulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+		//simulation.schedule(new votingSMPC(simulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+
+
+		offlinePhaseSimulation.doAllEvents() ;
+
+		Config config = new Config();
+
+		Parameters.NUMBER_OF_PARTIES = config.numberOfnodes;
+
+		System.out.println("offlinePhaseSimulation Ends");
+		System.out.println("offlinePhaseSimulation Recieves are " + Parameters.count);
+		System.out.println("offlinePhaseSimulation Execution Time: " + offlinePhaseSimulation.time);
+
+		return (float) offlinePhaseSimulation.time;
+
+	}
+
+	static private void searchForExecutionTime(PrintWriter writer, float perClusterComputationTime){
+		//				float bandWidth = 100;
+		//bw is byte per 10 ms
+		for(int bandWidth = 1 ; bandWidth < 2000000 ; bandWidth = bandWidth * 2){
 //				{int bandWidth = 1 ;
-					for(float dataSize = 1 ; dataSize < 1000000000 ; dataSize = dataSize *  4){
+			for(float dataSize = 1 ; dataSize < 1000000000 ; dataSize = dataSize *  4){
 //					{float dataSize = 1024;
-						//delay is per 10 ms
-						for(float delay = 1 ; delay < 20 ; delay = delay + 2){
+				//delay is per 10 ms
+				for(float delay = 1 ; delay < 20 ; delay = delay + 2){
 //						{long delay = 7;
-							float currentLengthBeforeChange = 0;
-							float acceptableTimeError = 100;
-							boolean timeEnough = false;
-							float LENGTH_RANGE = (float)100* (float)1000000000;
-							float lastLength = 0;
-							float minLength = 0;
-							float maxLength = LENGTH_RANGE;
-							float currentLength = (maxLength + minLength)/2;
+					float currentLengthBeforeChange = 0;
+					float acceptableTimeError = 100;
+					boolean timeEnough = false;
+					float LENGTH_RANGE = (float)100* (float)1000000000;
+					float lastLength = 0;
+					float minLength = 0;
+					float maxLength = LENGTH_RANGE;
+					float currentLength = (maxLength + minLength)/2;
 
-							while(true)
-							{
-								System.out.println("length: " + currentLength);
+					while(true)
+					{
+						System.out.println("length: " + currentLength);
 
-								//set onlinePhaseSimulation configuration
-								Config config = new Config();
+						//set simulation configuration
+						Config config = new Config();
 
-								//settings that do not change
-								config.delayDistType = NetworkPacket.RTTDelayDistributionType.CONSTANT;
-								config.failureRate = Integer.MAX_VALUE;
-								config.numberOfnodes = 10000;
-								config.numberOfLayersTopology = 9;
+						//settings that do not change
+						config.delayDistType = NetworkPacket.RTTDelayDistributionType.CONSTANT;
+						config.failureRate = Integer.MAX_VALUE;
+						config.numberOfnodes = 10000;
+						config.numberOfLayersTopology = 9;
 
-								//settings that change
-								config.nodeInitialDataSize = dataSize;
-								config.bandWidth = bandWidth;
-								config.constantDelay = delay;
+						//settings that change
+						config.nodeInitialDataSize = dataSize;
+						config.bandWidth = bandWidth;
+						config.constantDelay = delay;
 
-								config.lengthOfRound = currentLength ;
+						config.lengthOfRound = currentLength ;
 
-								CommunicationTreeSimulator sim = new CommunicationTreeSimulator(config);
-								sim.searchForMinimumRoundLength = true;
-								sim.initialize();
-								timeEnough = sim.simulate();
+						CommunicationTreeSimulator sim = new CommunicationTreeSimulator(config);
+						sim.searchForMinimumRoundLength = true;
+						sim.initialize();
+						timeEnough = sim.simulate();
 
-								//adjust the time for next cycles
-								lastLength = currentLengthBeforeChange;
-								currentLengthBeforeChange = currentLength;
+						//adjust the time for next cycles
+						lastLength = currentLengthBeforeChange;
+						currentLengthBeforeChange = currentLength;
 
-								if (!timeEnough)	{
-									minLength = currentLength;
-									currentLength = (currentLength + maxLength)/2 ;
+						if (!timeEnough)	{
+							minLength = currentLength;
+							currentLength = (currentLength + maxLength)/2 ;
 
-								}
-								else if (timeEnough){
-									if(Math.abs(currentLengthBeforeChange - lastLength)< acceptableTimeError){
-										writer.println(bandWidth + " " + delay + " " + dataSize + " " + currentLength);
-										writer.flush();
-										break;
-									}else{
-										maxLength = currentLength;
-										currentLength = (currentLength + minLength) / 2;
-									}
-								}
-
-								if(currentLength == currentLengthBeforeChange){
-									currentLength++;
-								}
-								if(currentLength >= LENGTH_RANGE){
-									writer.println(bandWidth + " " + delay + " " + dataSize + " " + LENGTH_RANGE);
-									writer.flush();
-									break;
-								}
+						}
+						else if (timeEnough){
+							if(Math.abs(currentLengthBeforeChange - lastLength)< acceptableTimeError){
+								writer.println(bandWidth + " " + delay + " " + dataSize + " " + currentLength + perClusterComputationTime);
+								writer.flush();
+								break;
+							}else{
+								maxLength = currentLength;
+								currentLength = (currentLength + minLength) / 2;
 							}
+						}
+
+						if(currentLength == currentLengthBeforeChange){
+							currentLength++;
+						}
+						if(currentLength >= LENGTH_RANGE){
+							writer.println(bandWidth + " " + delay + " " + dataSize + " " + LENGTH_RANGE + " overflow");
+							writer.flush();
+							break;
 						}
 					}
 				}
-
-				writer.close();
 			}
-			catch (Exception e){
-				System.out.println("error occured");
-			}
-
-
 		}
 	}
-	
+
+
+	public static void main(String[] args) {
+		PrintStream out = null;
+
+
+		boolean searchForMinimumRoundLength  = true ;
+		boolean offlinePhase = true ;
+
+
+		if(offlinePhase == true){
+
+			simulateOfflinePhase();
+
+		}
+		else if (offlinePhase == false){
+			/*
+			Here we run online phase once to measure how long it takes to execute it for one cluser and then later add that to the execution time
+			 */
+
+				float perClusterOnlineExecutionTime = runOnlinePhaseSim();
+
+			/*
+			Start the communication network simulation with the parameter measured above
+			 */
+			// search for a minimum round duration time that all the packets can be delivered
+			if (searchForMinimumRoundLength == false){
+				Config config = new Config();
+				config.lengthOfRound = 30000;
+				config.online_phase_execution_time = perClusterOnlineExecutionTime;
+				CommunicationTreeSimulator sim = new CommunicationTreeSimulator(config);
+				sim.initialize();
+				sim.simulate();
+			}
+			else if (searchForMinimumRoundLength == true){
+				// do experiment on failre and etc
+				try{
+					PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
+					searchForExecutionTime(writer, perClusterOnlineExecutionTime);
+					writer.close();
+				}
+				catch (Exception e){
+					System.out.println("error occured");
+				}
+			}
+		}
+
+	}
+
+
 	public class FailedNode{
 		float timeLeftToRecoverMilliseconds;
 		int ID;
@@ -361,6 +410,8 @@ public class CommunicationTreeSimulator {
 			this.timeLeftToRecoverMilliseconds = roundsLeft;
 		}
 	}
+
+
 
 }
 

@@ -1,21 +1,21 @@
 package smpc.voting;
 
 import smpc.abstractlibrary.Event;
-import smpc.abstractlibrary.Parameters;
-import smpc.library.OnlinePhaseSimulation;
+import smpc.Parameters;
+import smpc.abstractlibrary.Simulation;
 
 public class votingSPDZ extends Event{
 
-	public  votingSPDZ(OnlinePhaseSimulation onlinePhaseSimulation, double startTime, int hostID ,  int start, int end)
+	public  votingSPDZ(Simulation simulation, double startTime, int hostID, int start, int end)
 	{
-		this.onlinePhaseSimulation = onlinePhaseSimulation;
+		this.simulation = simulation;
 		this.startTime = startTime ; 
 		this.hostID = hostID ;
 		
 		this.duration = 20.0 ;
 		this.type = "votingSPDZ";
-		
-		this.start = start ; 
+
+		this.start = start;
 		this.end = end ; 
 
 	}
@@ -28,22 +28,22 @@ public class votingSPDZ extends Event{
 		 * Do the preprocessing step required for SPDZ
 		 */
 		
-//		onlinePhaseSimulation.schedule(new schedulePreProcessingForSPDZ(onlinePhaseSimulation, startTime, Parameters.VIRTUAL_HOST , 0, Parameters.getNumberOfParties()));
+//		simulation.schedule(new schedulePreProcessingForSPDZ(simulation, startTime, Parameters.VIRTUAL_HOST , 0, Parameters.getNumberOfParties()));
 //
-//		onlinePhaseSimulation.doAllEvents() ;
+//		simulation.doAllEvents() ;
 //
 		/**
 		 * write the simulations here 
 		 */
 		
-		onlinePhaseSimulation.schedule(new votingCluster(onlinePhaseSimulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
-		onlinePhaseSimulation.doAllEvents() ;
+		simulation.schedule(new votingCluster(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+		simulation.doAllEvents() ;
 		
 		/**
 		 * output
 		 */
 		
-//		onlinePhaseSimulation.schedule(new OutputPhase(onlinePhaseSimulation, startTime,Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+//		simulation.schedule(new OutputPhase(simulation, startTime,Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
 		
 		return false;
 	}

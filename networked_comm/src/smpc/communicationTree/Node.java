@@ -1,11 +1,10 @@
-package smpc.Abstracts;
+package smpc.communicationTree;
 
 import smpc.Config;
 import smpc.Topology;
-import smpc.Abstracts.NetworkPacket.PacketType;
+import smpc.communicationTree.NetworkPacket.PacketType;
 
 import java.util.LinkedList;
-import java.util.TreeSet;
 import java.util.ArrayList;
 
 

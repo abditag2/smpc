@@ -1,6 +1,7 @@
 package smpc.events;
 
 import smpc.abstractlibrary.Event;
+import smpc.abstractlibrary.Simulation;
 import smpc.library.OnlinePhaseSimulation;
 
 public class PartiallyOpen extends Event {
@@ -8,8 +9,8 @@ public class PartiallyOpen extends Event {
 	
 	int openDestination ; 
 	int start, end ; 
-	public PartiallyOpen (OnlinePhaseSimulation onlinePhaseSimulation, double startTime, int hostID, int openDestination, int start, int end){
-		this.onlinePhaseSimulation = onlinePhaseSimulation;
+	public PartiallyOpen (Simulation simulation, double startTime, int hostID, int openDestination, int start, int end){
+		this.simulation = simulation;
 		this.startTime = startTime ; 
 		this.hostID = hostID ;
 		this.openDestination = openDestination ; 
@@ -27,7 +28,7 @@ public class PartiallyOpen extends Event {
 
 		for (int sendHostID = start ; sendHostID < end ; sendHostID ++)
 		{
-			onlinePhaseSimulation.schedule(new Send(onlinePhaseSimulation, startTime, sendHostID, openDestination));
+			simulation.schedule(new Send(simulation, startTime, sendHostID, openDestination));
 		}
 		
 		return true;

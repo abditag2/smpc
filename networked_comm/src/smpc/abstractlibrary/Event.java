@@ -1,13 +1,11 @@
 package smpc.abstractlibrary;
 
-import smpc.library.OnlinePhaseSimulation;
-
 public abstract class Event implements Comparable{
 
 	//This value needs to be defined with every new event type
 	
     protected double startTime;
-    protected OnlinePhaseSimulation onlinePhaseSimulation;
+    protected Simulation simulation;
 
     protected int hostID ; 
     public Double duration = null;
@@ -29,7 +27,9 @@ public abstract class Event implements Comparable{
      
     public double getFinishingTime(){
         double finishing_time = startTime + duration;
-    	this.onlinePhaseSimulation.time = Math.max(this.onlinePhaseSimulation.time, finishing_time );
+
+//    	this.simulation.time = Math.max(this.simulation.time, finishing_time );
+
         return finishing_time;
     }
     

@@ -1,4 +1,4 @@
-package smpc.Abstracts;
+package smpc.communicationTree;
 
 import java.util.Random;
 
@@ -52,11 +52,11 @@ public class NetworkPacket implements Comparable {
 	}
 
 	public enum PacketType{
-	    INPUTPACKET, 
-	    FORWAREDPACKET,
-	    COMBINEDPACKET
-	}	
-	
+		INPUTPACKET,
+		FORWAREDPACKET,
+		COMBINEDPACKET
+	}
+
 	public enum RTTDelayDistributionType{
 	    LINEAR,
 	    GAUSSIAN,

@@ -1,13 +1,14 @@
 package smpc.events;
 
 import smpc.abstractlibrary.Event;
+import smpc.abstractlibrary.Simulation;
 import smpc.library.OnlinePhaseSimulation;
 
 public class Open extends Event {
 
 	int start, end ; 
-	public Open (OnlinePhaseSimulation onlinePhaseSimulation, double startTime, int hostID, int start, int end){
-		this.onlinePhaseSimulation = onlinePhaseSimulation;
+	public Open (Simulation simulation, double startTime, int hostID, int start, int end){
+		this.simulation = simulation;
 		this.startTime = startTime ; 
 		this.hostID = hostID ;
 		
@@ -24,7 +25,7 @@ public class Open extends Event {
 		for (int j = start; j < end; j++) {
 			
 			for (int i = start; i < end; i++) {
-				onlinePhaseSimulation.schedule(new Send(onlinePhaseSimulation, startTime, i, j)) ;
+				simulation.schedule(new Send(simulation, startTime, i, j)) ;
 			}		
 		}
 		

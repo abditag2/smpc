@@ -42,14 +42,19 @@ public class Reshare extends Event {
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
             simulation.schedule(new ProtEncCommitCommit(simulation, startTime, i, 0, Parameters.getNumberOfParties()));
         }
-
+        simulation.doAllEvents();
+        System.out.println("Reshare 1");
 
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
             simulation.schedule( new Computation(simulation, simulation.time, i,
                     Parameters.ComputationType.SHE_ADD, Parameters.getNumberOfParties()));
         }
+        simulation.doAllEvents();
+        System.out.println("Reshare 2");
 
         simulation.schedule(new DistDec(simulation, simulation.time, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+        simulation.doAllEvents();
+        System.out.println("Reshare 3");
 
         if(Parameters.NEW_CIPHER_TEXT == true){
             for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
@@ -58,6 +63,8 @@ public class Reshare extends Event {
                 simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.SHE_ENCRYPT, 1));
             }
         }
+        simulation.doAllEvents();
+        System.out.println("Reshare 4");
 
         return false;
     }

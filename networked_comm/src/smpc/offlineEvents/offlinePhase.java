@@ -40,7 +40,7 @@ public class offlinePhase extends Event {
 
         System.out.println("Input Production(nI) started");
 
-        for (int j = 0 ; j < Math.ceil(2*Parameters.N_I/Parameters.M); j++){
+        for (int j = 0 ; j < Math.ceil(2*Parameters.getNumberOfParties()/Parameters.M); j++){
             for(int k = 0 ; k < Math.ceil(Parameters.NUMBER_OF_TRIPLETES_TOBE_GENERATED) ; k++){
                 simulation.schedule( new Computation(simulation, startTime, j, Parameters.ComputationType.RANDOM_GEN, 1));
                 simulation.schedule( new Computation(simulation, startTime, j, Parameters.ComputationType.SHE_ENCRYPT, 1));
@@ -57,22 +57,23 @@ public class offlinePhase extends Event {
             }
         }
         simulation.doAllEvents();
-
+        System.out.println("Triples(nm) started2");
         //Doing twice reshare
         for (int j = 0 ; j < Parameters.getNumberOfParties(); j++){
             for(int k = 0 ; k < Math.ceil(Parameters.NUMBER_OF_TRIPLETES_TOBE_GENERATED) ; k++){
+                System.out.println("Triples(nm) started3." + j);
                 simulation.schedule(new Reshare(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+                simulation.doAllEvents();
             }
         }
-        simulation.doAllEvents();
-
+        System.out.println("Triples(nm) started3");
         for (int j = 0 ; j < Parameters.getNumberOfParties(); j++){
             for(int k = 0 ; k < Math.ceil(Parameters.NUMBER_OF_TRIPLETES_TOBE_GENERATED) ; k++){
                 simulation.schedule(new Reshare(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
             }
         }
         simulation.doAllEvents();
-
+        System.out.println("Triples(nm) started4");
 
         for (int k = 0 ; k < Parameters.getNumberOfParties(); k++){
             simulation.schedule( new Computation(simulation, simulation.time, k, Parameters.ComputationType.SHE_MULTIPLY, 1));
@@ -124,6 +125,7 @@ public class offlinePhase extends Event {
          CheckTriples()
          For k in {1,...,nm}
          Every player broadcasts 3 values (there is some constant amount of addition/subtraction work for each player, but I guess we can ignore that)
+         run MacCheck!
          */
 
         for(int k = 0 ; k < Parameters.N_M ; k++){
@@ -131,6 +133,8 @@ public class offlinePhase extends Event {
                 simulation.schedule(new BroadCast(simulation, simulation.time, j, 0, Parameters.getNumberOfParties()));
             }
         }
+
+        simulation.schedule(new MacCheck(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties(), 0));
 
         return false;
     }

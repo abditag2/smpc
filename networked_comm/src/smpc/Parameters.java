@@ -15,47 +15,53 @@ public class Parameters {
 	 * Cluster info
 	 */
 
-	static public int NUMBER_OF_PARTIES = 5 ;
+	static public int NUMBER_OF_PARTIES = 10 ;
 
 	/***
 	 * Computation Costs
 	 */
 
-	static public int ADDITION_TIME  = 1;
-	static public int MULITIPLICATION_TIME  = 1;
-	static public int XOR_TIME  = 1;
-	static public int RANDOM_GEN_TIME  = 1;
-	static public int COMMIT_COMPUTATION_COST  = 1;
-	static public int SEND_TIME  = 1;
-	static public int RECEIVE_TIME = 2;
+	//I am setting these times to zero becaus they are so negligible and dont make a difference
+	static public int ADDITION_TIME  = 0;
+	static public int MULITIPLICATION_LOCAL_TIME = 0;
+	static public int XOR_TIME  = 0;
+
+	//Units of time are 100 uSeconds
+
+	/**
+	 * SHA256 genreation takes 50 ms per MByte of data.
+	 * Since we are always using it for Integers, I assume it takes 1 ms
+	 */
+	static public int HASH_GENERATION_TIME = 500;
+
+	static public int RANDOM_GEN_TIME  = 10;
+
 	static public int SHE_ENCRYPT_TIME = 1;
 	static public int SHE_DECRYPT_TIME = 1;
-	static public int AES_ENCRYPT_TIME = 1;
-	static public int HASH_GENERATION_TIME = 1;
 
-	static public int COMPUTATION_COST1  = 2;
-	static public int RANDOM_COIN_GENERATION_LOCAL = 1;
-	static public int FKEYGENDEC = 1;
-	static public int GENERATE_MAC_KEY = 1;
-	static public int GENERATE_ALPHA_i = 1;
-	static public int ENC_DIAG_ENC = 1;
-	static public int BOX_OPERATION = 1 ; 
-	static public int ZERO_KNOWLEDGE_COST  = 1;	
+	/**
+	 * AES genreation takes 10 ms per MByte of data.
+	 * Since we are always using it for Integers, I assume it takes 1 ms
+	 */
+	static public int AES_ENCRYPT_TIME = 10;
+
 
 	/**
 	 * Network Delay
-	 */	
-	static public int NETWORK_DELAY = 5 ;
+	 */
+	static public int NETWORK_DELAY = 1 ;
+	static public int SEND_TIME  = 1000;
+	static public int RECEIVE_TIME = 1000;
 
 	/**
 	 * Offline phase paramteres
 	 */
 
 	static public boolean NEW_CIPHER_TEXT = true;
-	static public int N_I = 10;
 	static public int M = 10;
 	static public int N_M = 10;
 	static public int N_CIPHER = 10;
+
 	//TODO verify what these numbers are
 	// nI input tuples,
 	// nm = number of multiplication
@@ -69,13 +75,10 @@ public class Parameters {
 				duration = ADDITION_TIME;
 				break;
 			case MULITIPLICATION:
-				duration = MULITIPLICATION_TIME;
+				duration = MULITIPLICATION_LOCAL_TIME;
 				break;
 			case RANDOM_GEN:
 				duration = RANDOM_GEN_TIME;
-				break;
-			case COMMIT_COMPUTATION:
-				duration = COMMIT_COMPUTATION_COST;
 				break;
 			case SEND:
 				duration = SEND_TIME;
@@ -129,7 +132,7 @@ public class Parameters {
 		return NUMBER_OF_PARTIES; 
 	}
 
-	//TODO update this!
+	//TODO fix this
 	static public int getNumberOfMultiplications(){
 		return N_M;
 	}

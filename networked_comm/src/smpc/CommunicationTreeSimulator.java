@@ -17,7 +17,7 @@ public class CommunicationTreeSimulator {
 	public Topology topology;
 	public Config config;
 
-	public boolean searchForMinimumRoundLength = false;
+	public boolean searchForMinimumRoundLength = true;
 	
 	
 	public CommunicationTreeSimulator(Config config) {
@@ -243,13 +243,14 @@ public class CommunicationTreeSimulator {
 
 		System.out.println("OnlinePhaseSimulation Ends");
 		System.out.println("OnlinePhaseSimulation Recieves are " + Parameters.count);
-		System.out.println("OnlinePhaseSimulation Execution Time: " + onlinePhaseSimulation.time);
+		System.out.println("OnlinePhaseSimulation Execution Time: " + onlinePhaseSimulation.getLastFinishingTimeForAllNodes());
 
 		return (float) onlinePhaseSimulation.time;
 	}
 
 	static private float simulateOfflinePhase(){
 		Parameters.count = 0 ;
+		Parameters.N_M = 10;
 
 		System.out.println("offlinePhaseSimulation Starting");
 		OfflinePhaseSimulation offlinePhaseSimulation = new OfflinePhaseSimulation();
@@ -268,22 +269,18 @@ public class CommunicationTreeSimulator {
 
 		System.out.println("offlinePhaseSimulation Ends");
 		System.out.println("offlinePhaseSimulation Recieves are " + Parameters.count);
-		System.out.println("offlinePhaseSimulation Execution Time: " + offlinePhaseSimulation.time);
+		System.out.println("offlinePhaseSimulation Execution Time: " + offlinePhaseSimulation.getLastFinishingTimeForAllNodes());
 
 		return (float) offlinePhaseSimulation.time;
 
 	}
 
 	static private void searchForExecutionTime(PrintWriter writer, float perClusterComputationTime){
-		//				float bandWidth = 100;
-		//bw is byte per 10 ms
-		for(int bandWidth = 1 ; bandWidth < 2000000 ; bandWidth = bandWidth * 2){
-//				{int bandWidth = 1 ;
-			for(float dataSize = 1 ; dataSize < 1000000000 ; dataSize = dataSize *  4){
-//					{float dataSize = 1024;
-				//delay is per 10 ms
-				for(float delay = 1 ; delay < 20 ; delay = delay + 2){
-//						{long delay = 7;
+		for(float delay = 20 ; delay < 200 ; delay = delay*2){
+			for(int bandWidth = 1 ; bandWidth < 2000000 ; bandWidth = bandWidth * 2){
+//				for(float dataSize = 1 ; dataSize < 1000000000 ; dataSize = dataSize *  4){
+				{float dataSize = 1;
+
 					float currentLengthBeforeChange = 0;
 					float acceptableTimeError = 100;
 					boolean timeEnough = false;
@@ -303,7 +300,7 @@ public class CommunicationTreeSimulator {
 						//settings that do not change
 						config.delayDistType = NetworkPacket.RTTDelayDistributionType.CONSTANT;
 						config.failureRate = Integer.MAX_VALUE;
-						config.numberOfnodes = 10000;
+						config.numberOfnodes = 1000;
 						config.numberOfLayersTopology = 9;
 
 						//settings that change
@@ -358,7 +355,7 @@ public class CommunicationTreeSimulator {
 
 
 		boolean searchForMinimumRoundLength  = true ;
-		boolean offlinePhase = true ;
+		boolean offlinePhase = false ;
 
 
 		if(offlinePhase == true){
@@ -371,7 +368,7 @@ public class CommunicationTreeSimulator {
 			Here we run online phase once to measure how long it takes to execute it for one cluser and then later add that to the execution time
 			 */
 
-				float perClusterOnlineExecutionTime = runOnlinePhaseSim();
+			float perClusterOnlineExecutionTime = runOnlinePhaseSim();
 
 			/*
 			Start the communication network simulation with the parameter measured above

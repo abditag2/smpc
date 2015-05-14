@@ -26,29 +26,37 @@ public class Reshare extends Event {
     @Override
     public boolean execute() {
 
+
+        //TODO make sure n is number of parties
         /**
          * Class ProtReshare(c, enc)
-         Call EncCommit()
-         Every player Pi calls SHE.Add() n times (this would first need to call SHE.Encrypt() and then add the resulting ciphertexts, the cost of encryption is not part of the protocol)
-         Call DistDec
-         If enc = NewCiphertext
-         Call SHE.Encryption()
-         Call SHE.Add() n times
+             Call EncCommit()
+             Every player Pi calls SHE.Add() n times (this would first need
+                to call SHE.Encrypt() and then add the resulting ciphertexts, the cost of encryption is not part of the protocol)
+             Call DistDec
+             If enc = NewCiphertext
+                 Call SHE.Encryption()
+                Call SHE.Add() n times
          *
          */
-
-        simulation.schedule(new ProtEncCommitCommit(simulation, startTime, hostID, 0, Parameters.getNumberOfParties()));
-        for (int i = 0; i < Parameters.getNumberOfParties() ; i++)
-        {
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.SHE_ADD));
+        for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
+            simulation.schedule(new ProtEncCommitCommit(simulation, startTime, i, 0, Parameters.getNumberOfParties()));
         }
 
-        simulation.schedule(new DistDec(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
 
-        simulation.doAllEvents();
+        for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
+            simulation.schedule( new Computation(simulation, simulation.time, i,
+                    Parameters.ComputationType.SHE_ADD, Parameters.getNumberOfParties()));
+        }
+
+        simulation.schedule(new DistDec(simulation, simulation.time, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+
         if(Parameters.NEW_CIPHER_TEXT == true){
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.SHE_ADD));
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.SHE_ENCRYPT));
+            for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
+                simulation.schedule( new Computation(simulation, simulation.time, i,
+                        Parameters.ComputationType.SHE_ADD, Parameters.getNumberOfParties()));
+                simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.SHE_ENCRYPT, 1));
+            }
         }
 
         return false;

@@ -12,15 +12,18 @@ public class Parameters {
 	static public int NUMBER_OF_TRIPLETES_TOBE_GENERATED = 1;
 
 	/**
-	* Cluster info
-	*/
-	static public int ADDITION_TIME  = 1;
+	 * Cluster info
+	 */
+
+	static public int NUMBER_OF_PARTIES = 5 ;
 
 	/***
 	 * Computation Costs
 	 */
 
-	static public int NUMBER_OF_PARTIES = 5 ;
+	static public int ADDITION_TIME  = 1;
+	static public int MULITIPLICATION_TIME  = 1;
+	static public int XOR_TIME  = 1;
 	static public int RANDOM_GEN_TIME  = 1;
 	static public int COMMIT_COMPUTATION_COST  = 1;
 	static public int SEND_TIME  = 1;
@@ -49,8 +52,13 @@ public class Parameters {
 	 */
 
 	static public boolean NEW_CIPHER_TEXT = true;
-	//TODO verify this is correct
+	static public int N_I = 10;
+	static public int M = 10;
+	static public int N_M = 10;
 	static public int N_CIPHER = 10;
+	//TODO verify what these numbers are
+	// nI input tuples,
+	// nm = number of multiplication
 
 	static public double getDuration(ComputationType computationType){
 
@@ -59,6 +67,9 @@ public class Parameters {
 		{
 			case ADDITION:
 				duration = ADDITION_TIME;
+				break;
+			case MULITIPLICATION:
+				duration = MULITIPLICATION_TIME;
 				break;
 			case RANDOM_GEN:
 				duration = RANDOM_GEN_TIME;
@@ -84,7 +95,9 @@ public class Parameters {
 			case HASH_GENERATION:
 				duration = HASH_GENERATION_TIME;
 				break;
-
+			case XOR:
+				duration = XOR_TIME;
+				break;
 		}
 
 		return (double) duration;
@@ -93,6 +106,8 @@ public class Parameters {
 
 	public enum ComputationType{
 		ADDITION,
+		XOR,
+		MULITIPLICATION,
 		RANDOM_GEN,
 		COMMIT_COMPUTATION,
 		SHE_ENCRYPT,
@@ -113,7 +128,12 @@ public class Parameters {
 	static public int getNumberOfParties(){
 		return NUMBER_OF_PARTIES; 
 	}
-	
+
+	//TODO update this!
+	static public int getNumberOfMultiplications(){
+		return N_M;
+	}
+
 	static public int getNumberOfCurruptedParties()
 	{
 		return (int) (getNumberOfParties()/16);

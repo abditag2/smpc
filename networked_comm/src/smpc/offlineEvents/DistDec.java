@@ -26,10 +26,15 @@ public class DistDec extends Event {
     @Override
     public boolean execute() {
 
-        for (int hostID = 0 ; hostID < Parameters.getNumberOfParties(); hostID++){
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.SHE_DECRYPT));
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.SHE_DECRYPT));
-            simulation.schedule( new BroadCast(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
+        /**
+         DistDec(c)
+         Every player Pi calls SHE.Decrypt 2 times
+         Every player Pi broadcasts a value
+         */
+
+        for (int i = 0 ; i < Parameters.getNumberOfParties(); i++){
+            simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.SHE_DECRYPT, 2));
+            simulation.schedule( new BroadCast(simulation, simulation.time, i, 0, Parameters.getNumberOfParties()));
         }
         return false;
     }

@@ -6,8 +6,8 @@ import java.util.*;
 import smpc.communicationTree.*;
 import smpc.library.OnlinePhaseSimulation;
 import smpc.library.OfflinePhaseSimulation;
-import smpc.offline.offlinePhase;
-import smpc.voting.votingSPDZ;
+import smpc.offlineEvents.offlinePhase;
+import smpc.voting.OnlinePhaseForVotingSPDZ;
 
 import java.io.PrintWriter;
 
@@ -231,7 +231,7 @@ public class CommunicationTreeSimulator {
 		double timeToSchedule = 0 ;
 
 
-		onlinePhaseSimulation.schedule(new votingSPDZ(onlinePhaseSimulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+		onlinePhaseSimulation.schedule(new OnlinePhaseForVotingSPDZ(onlinePhaseSimulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
 		//simulation.schedule(new votingSMPC(simulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
 
 
@@ -259,7 +259,6 @@ public class CommunicationTreeSimulator {
 
 		offlinePhaseSimulation.schedule(new offlinePhase(offlinePhaseSimulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
 		//simulation.schedule(new votingSMPC(simulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
-
 
 		offlinePhaseSimulation.doAllEvents() ;
 

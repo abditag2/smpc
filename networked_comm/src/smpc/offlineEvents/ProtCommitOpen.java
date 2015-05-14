@@ -39,10 +39,8 @@ public class ProtCommitOpen extends Event {
         simulation.schedule( new BroadCast(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
 
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i ++ ){
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.HASH_GENERATION));
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.HASH_GENERATION));
+            simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.HASH_GENERATION, 2));
         }
-
 
         return false;
     }

@@ -45,7 +45,7 @@ public class ListQueue {
 			nodeInfo.get(event.getHostID()).setFinishTime(event.getFinishingTime());
 		}
 		
-		System.out.println("schedule type: " + event.type  +" st: " + event.getStartTime()  + " ft: " + event.getFinishingTime() + " hostID: " + event.getHostID());
+//		System.out.println("schedule type: " + event.type  +" st: " + event.getStartTime()  + " ft: " + event.getFinishingTime() + " hostID: " + event.getHostID());
 		
 		q.add(event);
 

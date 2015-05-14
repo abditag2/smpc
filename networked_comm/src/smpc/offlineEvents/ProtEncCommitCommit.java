@@ -40,30 +40,28 @@ public class ProtEncCommitCommit extends Event{
          All players do n+1 modular additions
          */
 
-        simulation.schedule(new ProtCommitCommit(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
+        simulation.schedule(new ProtCommitCommit(simulation, simulation.time, hostID, Parameters.VIRTUAL_HOST, Parameters.getNumberOfParties()));
         simulation.doAllEvents();
-        for (int i = 0 ; i < Parameters.N_CIPHER ; i++){
-            simulation.schedule(new ProtCommitCommit(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
-        }
 
         for (int i = 0 ; i < Parameters.N_CIPHER ; i++){
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.AES_ENCRYPT));
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.SHE_ENCRYPT));
-            simulation.schedule( new BroadCast(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
+            for(int j = 0 ; j < Parameters.getNumberOfParties() ; j++){
+                simulation.schedule(new ProtCommitCommit(simulation, simulation.time, j, 0, Parameters.getNumberOfParties()));
+                simulation.schedule( new Computation(simulation, simulation.time, j, Parameters.ComputationType.AES_ENCRYPT, 1));
+                simulation.schedule( new Computation(simulation, simulation.time, j, Parameters.ComputationType.SHE_ENCRYPT, 1));
+                simulation.schedule( new BroadCast(simulation, simulation.time, j, 0, Parameters.getNumberOfParties()));
+            }
         }
 
         simulation.doAllEvents();
 
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i ++){
-            simulation.schedule(new ProtCommitOpen(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
+            simulation.schedule(new ProtCommitOpen(simulation, simulation.time, i, 0, Parameters.getNumberOfParties()));
         }
         simulation.doAllEvents();
 
         for (int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.ADDITION));
+            simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.ADDITION, 1));
         }
-
-
 
         return false;
     }

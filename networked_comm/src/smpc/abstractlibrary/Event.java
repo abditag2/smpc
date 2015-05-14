@@ -6,13 +6,12 @@ public abstract class Event implements Comparable{
 	
     protected double startTime;
     protected Simulation simulation;
+    protected int hostID ;
 
-    protected int hostID ; 
+    public int numberOfTimes;
+    public int start, end ;
     public Double duration = null;
-    
-    public int start, end ; 
-    
-    public String type = null; 
+    public String type = null;
      
 	public int compareTo(Object o) {
 		

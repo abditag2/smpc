@@ -33,13 +33,11 @@ public class ProtCommitCommit extends Event{
              broadcasts c, i, tv, where i is index of player (a small integer), tv is handle for commitment (for our purpose tv is just an integer)
          */
 
-        for (int i = 0 ; i  < Parameters.getNumberOfParties() ; i++){
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.RANDOM_GEN));
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.RANDOM_GEN));
+        for (int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
+            simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.RANDOM_GEN, 1));
+            simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.HASH_GENERATION, 1));
+            simulation.schedule( new BroadCast(simulation, simulation.time, i, 0, Parameters.getNumberOfParties()));
         }
-
-        simulation.schedule( new BroadCast(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
-
 
         return false;
     }

@@ -29,19 +29,22 @@ public class ProtEncCommitOpen extends Event {
 
         /**
          ProtEncCommitOpen:
-         Every player Pi calls ProtCommitCommit.Open() c-1 times
+         Every player Pi calls ProtCommit.Open() c-1 times
          Every player Pi calls SHE.Encrypt n(c-1) times
          */
 
         for(int i = 0 ; i < Parameters.getNumberOfParties(); i++){
             for(int k =0 ; k < Parameters.N_CIPHER -1 ; k++){
-                simulation.schedule(new ProtCommitOpen(simulation, simulation.time, hostID, 0, Parameters.getNumberOfParties()));
+                simulation.schedule(new ProtCommitOpen(simulation, simulation.time, i, 0, Parameters.getNumberOfParties()));
             }
         }
 
         simulation.doAllEvents();
-        for(int k = 0 ; k < Parameters.N_CIPHER-1 ; k++){
-            simulation.schedule( new Computation(simulation, simulation.time, hostID, Parameters.ComputationType.SHE_ENCRYPT));
+
+        simulation.doAllEvents();
+        for(int k = 0 ; k < Parameters.getNumberOfParties() ; k++){
+            simulation.schedule( new Computation(simulation, simulation.time, k,
+                    Parameters.ComputationType.SHE_ENCRYPT, Parameters.N_CIPHER * Parameters.getNumberOfParties()));
         }
 
         return false;

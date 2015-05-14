@@ -8,7 +8,7 @@ import smpc.library.OnlinePhaseSimulation;
 public class Computation extends Event {
 
 	
-	public Computation(Simulation simulation, double startTime, int hostID, Parameters.ComputationType computationType)
+	public Computation(Simulation simulation, double startTime, int hostID, Parameters.ComputationType computationType, int numberOfTimes)
 	{
 		this.simulation = simulation;
 		this.startTime = startTime ; 
@@ -16,6 +16,7 @@ public class Computation extends Event {
 		
 		this.duration = Parameters.getDuration(computationType);
 		this.type = "Computation";
+		this.numberOfTimes = numberOfTimes;
 	}
 	
 	

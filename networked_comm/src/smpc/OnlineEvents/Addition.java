@@ -1,6 +1,7 @@
-package smpc.events;
+package smpc.OnlineEvents;
 
 import smpc.Parameters;
+import smpc.events.Computation;
 import smpc.library.OnlinePhaseSimulation;
 import smpc.abstractlibrary.Event;
 
@@ -12,8 +13,8 @@ public class Addition extends Event {
 		this.startTime = startTime ; 
 		this.hostID = hostID ;
 		
-		this.duration = 20.0 ;
-		this.type = "aDDITION";
+		this.duration = 0.0 ;
+		this.type = "Addition";
 		
 		this.start = start ; 
 		this.end = end ; 
@@ -29,7 +30,7 @@ public class Addition extends Event {
 			
 			for (int i = 0; i < Parameters.getNumberOfParties(); i++) 
 			{
-				simulation.schedule(new Computation(simulation, startTime, i, Parameters.ComputationType.ADDITION));
+				simulation.schedule(new Computation(simulation, startTime, i, Parameters.ComputationType.ADDITION,1));
 			}
 
 			return false ; 

@@ -58,13 +58,16 @@ public class Parameters {
 	 */
 
 	static public boolean NEW_CIPHER_TEXT = true;
-	static public int M = 10;
-	static public int N_M = 10;
-	static public int N_CIPHER = 10;
+	static public int M = 40000;
 
-	//TODO verify what these numbers are
-	// nI input tuples,
 	// nm = number of multiplication
+	static public int N_M = 10000;
+
+	//Number of Additions in the protocol
+	static public int N_A = 10000;
+
+	static public int N_CIPHER = 5;
+
 
 	static public double getDuration(ComputationType computationType){
 

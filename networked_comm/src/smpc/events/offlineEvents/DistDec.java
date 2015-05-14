@@ -1,4 +1,4 @@
-package smpc.offlineEvents;
+package smpc.events.offlineEvents;
 
 import smpc.Parameters;
 import smpc.abstractlibrary.Event;

@@ -61,7 +61,6 @@ public class Config {
 	public float TCP_PACKET_OVERHEAD = 40;
 
 	//Time to run online Phase with current number of nodes
-	public float online_phase_execution_time;
 	
 	public Config() {
 		/*
@@ -70,13 +69,13 @@ public class Config {
 		
 		this.nArry = 2;
 
-		this.numberOfLayersTopology = 4;
-		this.numberOfnodes = 60;
+//		this.numberOfLayersTopology = 4;
+//		this.numberOfnodes = 60;
 
 		this.delayDistType = RTTDelayDistributionType.NODELAY;
 		
-		this.RTTmin = 200;//milliseconds
-		this.RTTmax = 400;//milliseconds
+		this.RTTmin = 10;//milliseconds
+		this.RTTmax = 100;//milliseconds
 		
 		this.lengthOfRound = 60000; //milliseconds
 		this.percentOfCorruptedNodes = 0;
@@ -96,6 +95,5 @@ public class Config {
 		this.nodeInitialDataSize = 100;
 
 		this.constantDelay = 0;
-		this.online_phase_execution_time = 0;
 	}
 }

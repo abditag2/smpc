@@ -1,20 +1,20 @@
-package smpc.OnlineEvents;
+package smpc.events.OnlineEvents;
 
 import smpc.Parameters;
+import smpc.abstractlibrary.Simulation;
 import smpc.events.Computation;
-import smpc.library.OnlinePhaseSimulation;
 import smpc.abstractlibrary.Event;
-import smpc.offlineEvents.ProtCommitOpen;
+import smpc.events.offlineEvents.ProtCommitOpen;
 
 public class Multiplication extends Event {
 
-	public Multiplication(OnlinePhaseSimulation onlinePhaseSimulation, double startTime, int hostID , int start, int end){
+	public Multiplication(Simulation simulation, double startTime, int hostID , int start, int end){
 
-		this.simulation = onlinePhaseSimulation;
+		this.simulation = simulation;
 		this.startTime = startTime ; 
 		this.hostID = hostID ;
 		
-		this.duration = 20.0 ;
+		this.duration = 0.0 ;
 		this.type = "Multiplication";
 		
 		this.start = start ; 

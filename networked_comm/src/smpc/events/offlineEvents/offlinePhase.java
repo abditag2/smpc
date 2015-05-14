@@ -1,12 +1,10 @@
-package smpc.offlineEvents;
+package smpc.events.offlineEvents;
 
 import smpc.abstractlibrary.Event;
 import smpc.Parameters;
 import smpc.abstractlibrary.Simulation;
 import smpc.events.BroadCast;
 import smpc.events.Computation;
-import smpc.offlineEvents.ProtEncCommitCommit;
-import smpc.offlineEvents.Reshare;
 
 
 public class offlinePhase extends Event {
@@ -133,8 +131,6 @@ public class offlinePhase extends Event {
                 simulation.schedule(new BroadCast(simulation, simulation.time, j, 0, Parameters.getNumberOfParties()));
             }
         }
-
-        simulation.schedule(new MacCheck(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties(), 0));
 
         return false;
     }

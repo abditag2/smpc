@@ -1,4 +1,4 @@
-package smpc.OnlineEvents;
+package smpc.events.OnlineEvents;
 
 import smpc.Parameters;
 import smpc.events.Computation;

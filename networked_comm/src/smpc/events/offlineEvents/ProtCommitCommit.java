@@ -1,6 +1,5 @@
-package smpc.offlineEvents;
+package smpc.events.offlineEvents;
 
-import com.sun.xml.internal.rngom.digested.DDataPattern;
 import smpc.Parameters;
 import smpc.abstractlibrary.Event;
 import smpc.abstractlibrary.Simulation;

@@ -1,6 +1,7 @@
 import Config.Config;
 import Nodes.EdgeNode;
 import Nodes.MainClusterNode;
+
 import java.io.PrintWriter;
 
 /**
@@ -13,48 +14,45 @@ import java.io.PrintWriter;
 
 public class Simulator {
 
-    public void Simulator(){
+    public void Simulator() {
 
     }
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         try {
-            PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
+            PrintWriter writer = new PrintWriter("EXP1_direct_communication.txt", "UTF-8");
 
-//            int bandwidth = 100;
-            for(int bandWidth = 1 ; bandWidth < 2000000 ; bandWidth = bandWidth * 2) {
-                for (long dataSize = 1; dataSize < 1000000000; dataSize = dataSize * 4) {
-                    //delay is per 10 ms
+            int numberOfnodes = 10000;
 
-                    for (long delay = 1; delay < 20; delay = delay + 2) {
+            writer.println("EXP1_direct_communication" + "numberOfnodes: " + numberOfnodes);
+            float delay = 50;
 
-                        System.out.println("Simulation started");
-                        Config config = new Config();
+            for (int bandWidth = 1000; bandWidth <= 100000; bandWidth = bandWidth * 10) {
+                for (int dataSize = 1; dataSize < 1000000; dataSize = dataSize * 2) {
 
-                        config.BANDWIDTH = 100;
-                        config.COMMUNICATION_SETUP_OVERHEAD = delay;
-                        //taking into account the over head of TCP
-                        config.AVG_DATA_SIZE = dataSize + (long)Math.floor(dataSize / config.TCP_PACKET_SIZE) *  config.TCP_PACKET_OVERHEAD_BYTES;
-                        config.NUMBER_OF_EDGE_NODES = 10000;
-                        config.CONCURRENT_CONNECTIONS = 10;
+                    Config config = new Config();
 
-                        MainClusterNode mainNode = new MainClusterNode();
-                        float[] results = mainNode.runSimulation();
+                    config.BANDWIDTH = bandWidth;
+                    config.COMMUNICATION_SETUP_OVERHEAD = delay;
 
-                        System.out.println("Results:");
-                        System.out.println("\ttime: " + results[0]);
-                        writer.println(bandWidth + " " + delay + " " + dataSize + " " + results[0]);
-                    }
+                    //taking into account the over head of TCP
+                    config.AVG_DATA_SIZE = dataSize + (long) Math.floor(dataSize / config.TCP_PACKET_SIZE) * config.TCP_PACKET_OVERHEAD_BYTES;
+                    config.NUMBER_OF_EDGE_NODES = numberOfnodes;
+                    config.CONCURRENT_CONNECTIONS = 20;
+
+                    MainClusterNode mainNode = new MainClusterNode();
+                    float[] results = mainNode.runSimulation();
+
+                    writer.println(delay + " " + bandWidth + " " + dataSize + " " + results[0]);
                 }
             }
+
             writer.close();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Error Happened");
         }
-
 
 
     }

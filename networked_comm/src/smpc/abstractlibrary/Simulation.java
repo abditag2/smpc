@@ -32,6 +32,10 @@ public class Simulation {
         return;
     }
 
+    public void setAllFinishingTimes(double time){
+        eventQueue.setAllFinishingTimes(time);
+    }
+
 }
 
 

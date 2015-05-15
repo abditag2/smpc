@@ -6,10 +6,7 @@ public class Parameters {
 	
 	static public int VIRTUAL_HOST = -1 ;
 
-	/**
-	offline phase parameters
-	 */
-	static public int NUMBER_OF_TRIPLETES_TOBE_GENERATED = 1;
+
 
 	/**
 	 * Cluster info
@@ -32,26 +29,26 @@ public class Parameters {
 	 * SHA256 genreation takes 50 ms per MByte of data.
 	 * Since we are always using it for Integers, I assume it takes 1 ms
 	 */
-	static public int HASH_GENERATION_TIME = 500;
+	static public int HASH_GENERATION_TIME = 1;
 
-	static public int RANDOM_GEN_TIME  = 10;
+	static public int RANDOM_GEN_TIME  = 1;
 
-	static public int SHE_ENCRYPT_TIME = 1;
-	static public int SHE_DECRYPT_TIME = 1;
+	static public int SHE_ENCRYPT_TIME = 10;
+	static public int SHE_DECRYPT_TIME = 10;
 
 	/**
 	 * AES genreation takes 10 ms per MByte of data.
 	 * Since we are always using it for Integers, I assume it takes 1 ms
 	 */
-	static public int AES_ENCRYPT_TIME = 10;
+	static public int AES_ENCRYPT_TIME = 15;
 
 
 	/**
 	 * Network Delay
 	 */
-	static public int NETWORK_DELAY = 1 ;
-	static public int SEND_TIME  = 1000;
-	static public int RECEIVE_TIME = 1000;
+	static public int NETWORK_DELAY = 50 ;
+	static public int SEND_TIME  = 0;
+	static public int RECEIVE_TIME = 1;
 
 	/**
 	 * Offline phase paramteres
@@ -66,7 +63,12 @@ public class Parameters {
 	//Number of Additions in the protocol
 	static public int N_A = 10000;
 
-	static public int N_CIPHER = 5;
+	static public int N_CIPHER = 4;
+
+	/**
+	 * global variables
+	 */
+	static public double RESHARE_TIMES = 5;
 
 
 	static public double getDuration(ComputationType computationType){

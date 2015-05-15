@@ -43,16 +43,17 @@ public class ProtEncCommitCommit extends Event{
         simulation.schedule(new ProtCommitCommit(simulation, simulation.time, hostID, Parameters.VIRTUAL_HOST, Parameters.getNumberOfParties()));
         simulation.doAllEvents();
 
+        System.out.println("ProtCommitCommit");
         for (int i = 0 ; i < Parameters.N_CIPHER ; i++){
             for(int j = 0 ; j < Parameters.getNumberOfParties() ; j++){
                 simulation.schedule(new ProtCommitCommit(simulation, simulation.time, j, 0, Parameters.getNumberOfParties()));
                 simulation.schedule( new Computation(simulation, simulation.time, j, Parameters.ComputationType.AES_ENCRYPT, 1));
                 simulation.schedule( new Computation(simulation, simulation.time, j, Parameters.ComputationType.SHE_ENCRYPT, 1));
                 simulation.schedule( new BroadCast(simulation, simulation.time, j, 0, Parameters.getNumberOfParties()));
+                simulation.doAllEvents();
             }
         }
 
-        simulation.doAllEvents();
 
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i ++){
             simulation.schedule(new ProtCommitOpen(simulation, simulation.time, i, 0, Parameters.getNumberOfParties()));

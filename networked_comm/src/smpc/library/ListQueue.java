@@ -73,4 +73,11 @@ public class ListQueue {
 		return time;
 	}
 
+	public void setAllFinishingTimes(double time){
+
+		for(NodeInfo node: nodeInfo){
+			node.finishTimes = time ;
+		}
+	}
+
 }

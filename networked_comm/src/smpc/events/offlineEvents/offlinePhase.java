@@ -38,10 +38,10 @@ public class offlinePhase extends Event {
 
         System.out.println("Input Production(nI) started");
 
-        for (int j = 0 ; j < Math.ceil(2*Parameters.getNumberOfParties()/Parameters.M); j++){
-            for(int k = 0 ; k < Math.ceil(Parameters.NUMBER_OF_TRIPLETES_TOBE_GENERATED) ; k++){
+        for (int j = 0 ; j < Math.ceil(2 * Parameters.getNumberOfParties() / Parameters.M); j++){
+            for(int k = 0 ; k < Math.ceil(Parameters.N_M) ; k++){
                 simulation.schedule( new Computation(simulation, startTime, j, Parameters.ComputationType.RANDOM_GEN, 1));
-                simulation.schedule( new Computation(simulation, startTime, j, Parameters.ComputationType.SHE_ENCRYPT, 1));
+                simulation.schedule(new Computation(simulation, startTime, j, Parameters.ComputationType.SHE_ENCRYPT, 1));
             }
         }
 
@@ -50,26 +50,29 @@ public class offlinePhase extends Event {
 
 
         for (int j = 0 ; j < Parameters.getNumberOfParties(); j++){
-            for(int k = 0 ; k < Math.ceil(Parameters.NUMBER_OF_TRIPLETES_TOBE_GENERATED) ; k++){
+            for(int k = 0 ; k < Math.ceil(Parameters.N_M) ; k++){
                 simulation.schedule( new BroadCast(simulation, simulation.time, j, 0, Parameters.getNumberOfParties()));
-            }
-        }
-        simulation.doAllEvents();
-        System.out.println("Triples(nm) started2");
-        //Doing twice reshare
-        for (int j = 0 ; j < Parameters.getNumberOfParties(); j++){
-            for(int k = 0 ; k < Math.ceil(Parameters.NUMBER_OF_TRIPLETES_TOBE_GENERATED) ; k++){
-                System.out.println("Triples(nm) started3." + j);
-                simulation.schedule(new Reshare(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
                 simulation.doAllEvents();
             }
         }
-        System.out.println("Triples(nm) started3");
-        for (int j = 0 ; j < Parameters.getNumberOfParties(); j++){
-            for(int k = 0 ; k < Math.ceil(Parameters.NUMBER_OF_TRIPLETES_TOBE_GENERATED) ; k++){
-                simulation.schedule(new Reshare(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
-            }
-        }
+
+        System.out.println("Triples(nm) started2");
+        //Doing twice reshare
+
+
+
+        //DO  a reshare
+        simulation.setAllFinishingTimes(simulation.getLastFinishingTimeForAllNodes() + Parameters.RESHARE_TIMES);
+        //Instead of the following we did the above since reshare is very expensive!
+//
+//        System.out.println("Triples(nm) started3");
+//        for (int j = 0 ; j < Parameters.getNumberOfParties(); j++){
+//            for(int k = 0 ; k < Math.ceil(Parameters.N_M) ; k++){
+//                simulation.schedule(new Reshare(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+//                simulation.schedule(new Reshare(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+//            }
+//        }
+
         simulation.doAllEvents();
         System.out.println("Triples(nm) started4");
 
@@ -91,7 +94,9 @@ public class offlinePhase extends Event {
 
         System.out.println("CheckTriples() started");
 
-        for(int k = 0 ; k < Math.ceil(4*Parameters.N_M /Parameters.M) ; k++) {
+
+
+        for(int k = 0 ; k < Math.ceil(4*Parameters.N_M/Parameters.M) ; k++) {
 
             simulation.schedule(new ProtEncCommitCommit(simulation, simulation.time, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
             simulation.doAllEvents();
@@ -103,36 +108,40 @@ public class offlinePhase extends Event {
                 simulation.schedule( new Computation(simulation, simulation.time, j, Parameters.ComputationType.SHE_MULTIPLY, 1));
             }
 
-            simulation.schedule(new Reshare(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+            simulation.setAllFinishingTimes(simulation.getLastFinishingTimeForAllNodes() + Parameters.RESHARE_TIMES);
 
             for(int j = 0 ; j < Parameters.getNumberOfParties() ; j++){
                 simulation.schedule( new Computation(simulation, simulation.time, j, Parameters.ComputationType.SHE_MULTIPLY, 3));
             }
             simulation.doAllEvents();
 
-            simulation.schedule(new Reshare(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
-            simulation.schedule(new Reshare(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
-            simulation.schedule(new Reshare(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
         }
 
 
-        simulation.doAllEvents();
+//        4*Parameters.N_M times Reshare
+        for(int k = 0 ; k < Math.ceil(4*Parameters.N_M/Parameters.M) ; k++) {
+            simulation.setAllFinishingTimes(simulation.getLastFinishingTimeForAllNodes() + Parameters.RESHARE_TIMES);
+            simulation.setAllFinishingTimes(simulation.getLastFinishingTimeForAllNodes() + Parameters.RESHARE_TIMES);
+            simulation.setAllFinishingTimes(simulation.getLastFinishingTimeForAllNodes() + Parameters.RESHARE_TIMES);
+            simulation.doAllEvents();
 
-        /**
-         *
-         CheckTriples()
-         For k in {1,...,nm}
-         Every player broadcasts 3 values (there is some constant amount of addition/subtraction work for each player, but I guess we can ignore that)
-         run MacCheck!
-         */
+        }
 
-        for(int k = 0 ; k < Parameters.N_M ; k++){
-            for(int j = 0 ; j < Parameters.getNumberOfParties() ; j++) {
-                simulation.schedule(new BroadCast(simulation, simulation.time, j, 0, Parameters.getNumberOfParties()));
+
+            /**
+             *
+             CheckTriples()
+             For k in {1,...,nm}
+             Every player broadcasts 3 values (there is some constant amount of addition/subtraction work for each player, but I guess we can ignore that)
+             run MacCheck!
+             */
+
+            for(int k = 0 ; k < Parameters.N_M ; k++){
+                for(int j = 0 ; j < Parameters.getNumberOfParties() ; j++) {
+                    simulation.schedule(new BroadCast(simulation, simulation.time, j, 0, Parameters.getNumberOfParties()));
+                }
             }
+
+            return false;
         }
-
-        return false;
     }
-
-}

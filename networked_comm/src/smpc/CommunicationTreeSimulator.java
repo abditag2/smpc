@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.*;
 
 import smpc.communicationTree.*;
+import smpc.events.offlineEvents.Reshare;
 import smpc.library.OnlinePhaseSimulation;
 import smpc.library.OfflinePhaseSimulation;
 import smpc.events.offlineEvents.offlinePhase;
@@ -248,14 +249,10 @@ public class CommunicationTreeSimulator {
     }
 
     static private float simulateOfflinePhase() {
-        Parameters.count = 0;
-        Parameters.N_M = 10;
-
         System.out.println("offlinePhaseSimulation Starting");
         OfflinePhaseSimulation offlinePhaseSimulation = new OfflinePhaseSimulation();
 
         double timeToSchedule = 0;
-
 
         offlinePhaseSimulation.schedule(new offlinePhase(offlinePhaseSimulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
         //simulation.schedule(new votingSMPC(simulation, timeToSchedule, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
@@ -270,7 +267,7 @@ public class CommunicationTreeSimulator {
         System.out.println("offlinePhaseSimulation Recieves are " + Parameters.count);
         System.out.println("offlinePhaseSimulation Execution Time: " + offlinePhaseSimulation.getLastFinishingTimeForAllNodes());
 
-        return (float) offlinePhaseSimulation.time;
+        return (float) offlinePhaseSimulation.getLastFinishingTimeForAllNodes();
 
     }
 
@@ -303,6 +300,7 @@ public class CommunicationTreeSimulator {
             //settings that change
             config.nodeInitialDataSize = dataSize;
             config.bandWidth = bandWidth;
+            config.delayDistType = NetworkPacket.RTTDelayDistributionType.CONSTANT;
             config.constantDelay = delay;
 
             config.lengthOfRound = currentLength;
@@ -322,7 +320,7 @@ public class CommunicationTreeSimulator {
 
             } else if (timeEnough) {
                 if (Math.abs(currentLengthBeforeChange - lastLength) < acceptableTimeError) {
-                    writer.println(delay + " " + bandWidth + " " + dataSize + " " + currentLength);
+                    writer.println(delay + " " + bandWidth + " " + numberOfLayersTopology + " " + dataSize + " "  + config.numberOfnodes+  " " + currentLength);
                     writer.flush();
                     break;
                 } else {
@@ -335,7 +333,7 @@ public class CommunicationTreeSimulator {
                 currentLength++;
             }
             if (currentLength >= LENGTH_RANGE) {
-                writer.println(delay + " " + bandWidth + " " + dataSize + " " + LENGTH_RANGE + " overflow");
+                writer.println(delay + " " + bandWidth + " " + numberOfLayersTopology + " " + dataSize + " "  + config.numberOfnodes+ " " + LENGTH_RANGE + " overflow");
                 writer.flush();
                 break;
             }
@@ -364,15 +362,14 @@ public class CommunicationTreeSimulator {
                 int numberOfLayersTopology = 8;
                 int numberOfnodes = 10000;
 
-                writer.println("EXP1 " + "numberOfnodes: " + numberOfnodes + " Layers:  " + numberOfLayersTopology);
-//                for (float delay = 1; delay < 200; delay += 50) {
-                {float delay = 50;
-                    for (int bandWidth = 1; bandWidth < 100000; bandWidth = bandWidth * 2) {
-//          				for(float dataSize = 1 ; dataSize < 1000000000 ; dataSize = dataSize *  4){
-                        {float dataSize = 1000;
+                writer.println("EXP1_comm_network" + "numberOfnodes: " + numberOfnodes + " Layers:  " + numberOfLayersTopology);
 
+                float delay = 50;
+
+                for(int bandWidth = 1000; bandWidth <= 100000 ; bandWidth = bandWidth * 10){
+                    for (int dataSize = 1; dataSize < 1000000; dataSize = dataSize * 2) {
+                        {
                             searchForExecutionTime(writer, delay, bandWidth, dataSize, numberOfLayersTopology, numberOfnodes);
-
                         }
                     }
                 }
@@ -386,24 +383,159 @@ public class CommunicationTreeSimulator {
             try {
                 PrintWriter writer = new PrintWriter("EXP1_online_cluster_40.txt", "UTF-8");
 
-
-                int numberOfLayersTopology = 8;
-                int numberOfnodes = 40;
+                Parameters.NUMBER_OF_PARTIES = 40; //this is only for one cluster
                 Parameters.N_M = 10000;
                 Parameters.N_A = 10000;
 
-                writer.println("EXP1 " + "numberOfnodes: " + numberOfnodes + " Layers:  " + numberOfLayersTopology);
+
+                int numberOfLayersTopology = 8;
+                Parameters.RECEIVE_TIME = 1;
+
+                writer.println("EXP1 " + "numberOfnodes: " + Parameters.NUMBER_OF_PARTIES + " Layers:  " + numberOfLayersTopology);
                 float perClusterOnlineExecutionTime = runOnlinePhaseSim();
                 writer.println("Execution time: " + perClusterOnlineExecutionTime);
+
 
                 writer.close();
             } catch (Exception e) {
                 System.out.println("error occured");
             }
+        }
+        else if(expNumber == 2)
+        {
+
+            /**
+             *
+             duration of offline Phase for different numbers of Layers
+             with number of nodes 10000 nodes
+             number of layers: 10  9      8     7    6
+             cluster members:  5  10     40   80  150
+             */
+
+            float delay = 50;
+            float dataSize = 1000; //kb
+            int numberOfnodes = 10000;
+            int bandWidth = 10000000;
+
+            try {
+                PrintWriter writer = new PrintWriter("EXP2_network.txt", "UTF-8");
+
+                for(int numberOfLayersTopology = 6 ; numberOfLayersTopology <= 10 ; numberOfLayersTopology++ ) {
+                    searchForExecutionTime(writer, delay, bandWidth, dataSize, numberOfLayersTopology, numberOfnodes);
+                }
+
+                writer.close();
+            } catch (Exception e) {
+                System.out.println("error occurred");
+            }
+
+            try {
+                PrintWriter writer = new PrintWriter("EXP2_offline_phase.txt", "UTF-8");
+
+                Parameters.count = 0;
+
+                for(int numberOfLayersTopology = 10 ; numberOfLayersTopology >= 8 ; numberOfLayersTopology-- ){
+
+                    Parameters.N_M = 10000;
+
+                    Parameters.NUMBER_OF_PARTIES = (int) Math.ceil(10000/(Math.pow(2,numberOfLayersTopology) - 1));
+
+                    OfflinePhaseSimulation offlinePhaseSimulationToMeasureReshare = new OfflinePhaseSimulation();
+                    double time_before = offlinePhaseSimulationToMeasureReshare.getLastFinishingTimeForAllNodes();
+                    offlinePhaseSimulationToMeasureReshare.schedule(new Reshare(offlinePhaseSimulationToMeasureReshare, 0, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+                    offlinePhaseSimulationToMeasureReshare.doAllEvents();
+                    double time_after = offlinePhaseSimulationToMeasureReshare.getLastFinishingTimeForAllNodes();
+
+                    Parameters.RESHARE_TIMES = (time_after - time_before) * (Parameters.getNumberOfParties() * Math.ceil(Parameters.N_M) *2);
+                    System.out.println("time for a reshare: " + Parameters.RESHARE_TIMES + " numberOfLayersTopology: " + numberOfLayersTopology);
 
 
+                    /**
+                     *start the experiment
+                     */
+
+
+                    float executionTime = simulateOfflinePhase();
+
+                    writer.println(Parameters.NUMBER_OF_PARTIES  + " " + numberOfLayersTopology + " " + executionTime);
+                }
+
+                writer.close();
+            } catch (Exception e) {
+                System.out.println("error occurred");
+            }
 
         }
+
+        else if(expNumber == 3){
+
+            /**
+             *
+             duration of Offline Phase while depth of layers is constant and different sizes of cluster
+             number of layers = 8
+             number of nodes:  2600      5100       10200       15300       25600
+             cluster members:  10        20        40           60         100
+             */
+
+
+            float delay = 50;
+            float dataSize = 1000; //kb
+            int bandWidth = 10000000;
+            int numberOfLayersTopology = 8;
+
+            try {
+                PrintWriter writer = new PrintWriter("EXP3_network.txt", "UTF-8");
+
+                for(int numberOfnodes = 2600 ; numberOfnodes <= 30000 ; numberOfnodes = numberOfLayersTopology * 2 ) {
+                    searchForExecutionTime(writer, delay, bandWidth, dataSize, numberOfLayersTopology, numberOfnodes);
+                }
+
+                writer.close();
+            } catch (Exception e) {
+                System.out.println("error occurred");
+            }
+
+
+
+
+            try {
+                PrintWriter writer = new PrintWriter("EXP3_offline_phase.txt", "UTF-8");
+
+                Parameters.count = 0;
+
+                for(int numberOfnodes = 2600 ; numberOfnodes <= 30000 ; numberOfnodes = numberOfLayersTopology * 2 ) {
+
+                    Parameters.N_M = 10000;
+
+                    Parameters.NUMBER_OF_PARTIES = (int) Math.ceil(numberOfnodes/(Math.pow(2,numberOfLayersTopology) - 1));
+
+                    OfflinePhaseSimulation offlinePhaseSimulationToMeasureReshare = new OfflinePhaseSimulation();
+                    double time_before = offlinePhaseSimulationToMeasureReshare.getLastFinishingTimeForAllNodes();
+                    offlinePhaseSimulationToMeasureReshare.schedule(new Reshare(offlinePhaseSimulationToMeasureReshare, 0, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+                    offlinePhaseSimulationToMeasureReshare.doAllEvents();
+                    double time_after = offlinePhaseSimulationToMeasureReshare.getLastFinishingTimeForAllNodes();
+
+                    Parameters.RESHARE_TIMES = (time_after - time_before) * (Parameters.getNumberOfParties() * Math.ceil(Parameters.N_M) *2);
+                    System.out.println("time for a reshare: " + Parameters.RESHARE_TIMES + " numberOfLayersTopology: " + numberOfLayersTopology);
+
+
+                    /**
+                     *start the experiment
+                     */
+
+
+                    float executionTime = simulateOfflinePhase();
+
+                    writer.println(Parameters.NUMBER_OF_PARTIES  + " " + numberOfLayersTopology + " " + executionTime);
+                }
+
+                writer.close();
+            } catch (Exception e) {
+                System.out.println("error occurred");
+            }
+
+        }
+
 //
 //
 //        if (offlinePhase == true) {

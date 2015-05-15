@@ -39,10 +39,12 @@ public class Reshare extends Event {
                 Call SHE.Add() n times
          *
          */
+        System.out.println("Reshare 0");
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
             simulation.schedule(new ProtEncCommitCommit(simulation, startTime, i, 0, Parameters.getNumberOfParties()));
+            simulation.doAllEvents();
+            System.out.println("Reshare 0." + i);
         }
-        simulation.doAllEvents();
         System.out.println("Reshare 1");
 
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){

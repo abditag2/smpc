@@ -1,0 +1,11 @@
+time for a reshare: 9320000.0 numberOfLayersTopology: 10
+offlinePhaseSimulation Recieves are 48100
+offlinePhaseSimulation Execution Time: 9325250.0
+
+time for a reshare: 1.60104E8 numberOfLayersTopology: 9
+offlinePhaseSimulation Recieves are 752500
+offlinePhaseSimulation Execution Time: 1.6012485E8
+
+time for a reshare: 2.957408E9 numberOfLayersTopology: 8
+offlinePhaseSimulation Recieves are 11506100
+offlinePhaseSimulation Execution Time: 2.95749125E9

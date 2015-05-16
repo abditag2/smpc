@@ -148,7 +148,7 @@ public class CommunicationTreeSimulator {
 
     private boolean terminationConditionMet(int roundNumber, boolean protocolRan) {
         /*
-		 * condition1: At all the times there must be at least one honest party in each cluster.
+         * condition1: At all the times there must be at least one honest party in each cluster.
 		 */
         for (int i = 0; i < this.config.numberOfClusters(); i++) {
             ArrayList<Integer> clusterMembers = this.topology.getClusterMembers(i);
@@ -320,7 +320,7 @@ public class CommunicationTreeSimulator {
 
             } else if (timeEnough) {
                 if (Math.abs(currentLengthBeforeChange - lastLength) < acceptableTimeError) {
-                    writer.println(delay + " " + bandWidth + " " + numberOfLayersTopology + " " + dataSize + " "  + config.numberOfnodes+  " " + currentLength);
+                    writer.println(delay + " " + bandWidth + " " + numberOfLayersTopology + " " + dataSize + " " + config.numberOfnodes + " " + currentLength);
                     writer.flush();
                     break;
                 } else {
@@ -333,7 +333,7 @@ public class CommunicationTreeSimulator {
                 currentLength++;
             }
             if (currentLength >= LENGTH_RANGE) {
-                writer.println(delay + " " + bandWidth + " " + numberOfLayersTopology + " " + dataSize + " "  + config.numberOfnodes+ " " + LENGTH_RANGE + " overflow");
+                writer.println(delay + " " + bandWidth + " " + numberOfLayersTopology + " " + dataSize + " " + config.numberOfnodes + " " + LENGTH_RANGE + " overflow");
                 writer.flush();
                 break;
             }
@@ -351,9 +351,9 @@ public class CommunicationTreeSimulator {
         boolean commTreeNetwork = true;
         boolean searchForMinimumRoundLength = true;
 
-        int expNumber = 3;
+        int expNumber = 5;
 
-        if (expNumber == 1){
+        if (expNumber == 1) {
 
             try {
                 PrintWriter writer = new PrintWriter("EXP1_network.txt", "UTF-8");
@@ -364,7 +364,7 @@ public class CommunicationTreeSimulator {
 
                 float delay = 50;
 
-                for(int bandWidth = 1000; bandWidth <= 100000 ; bandWidth = bandWidth * 10){
+                for (int bandWidth = 1000; bandWidth <= 100000; bandWidth = bandWidth * 10) {
                     for (int dataSize = 1; dataSize < 1000000; dataSize = dataSize * 2) {
                         {
                             searchForExecutionTime(writer, delay, bandWidth, dataSize, numberOfLayersTopology, numberOfnodes);
@@ -398,9 +398,7 @@ public class CommunicationTreeSimulator {
             } catch (Exception e) {
                 System.out.println("error occured");
             }
-        }
-        else if(expNumber == 2)
-        {
+        } else if (expNumber == 2) {
 
             /**
              *
@@ -422,10 +420,10 @@ public class CommunicationTreeSimulator {
             try {
                 PrintWriter writer = new PrintWriter("EXP2_network.txt", "UTF-8");
 
-                int[] numberOfnodesArray= {1000, 5000, 10000};
+                int[] numberOfnodesArray = {1000, 5000, 10000};
 
-                for(int numberOfnodes: numberOfnodesArray){
-                    for(int numberOfLayersTopology = 6 ; numberOfLayersTopology <= 10 ; numberOfLayersTopology++ ) {
+                for (int numberOfnodes : numberOfnodesArray) {
+                    for (int numberOfLayersTopology = 6; numberOfLayersTopology <= 10; numberOfLayersTopology++) {
                         searchForExecutionTime(writer, delay, bandWidth, dataSize, numberOfLayersTopology, numberOfnodes);
                     }
                 }
@@ -444,14 +442,14 @@ public class CommunicationTreeSimulator {
                 writer.println("numberOfnodes Parameters.NUMBER_OF_PARTIES numberOfLayersTopology executionTime");
                 Parameters.count = 0;
 
-                int[] numberOfnodesArray= {1000, 5000, 10000};
+                int[] numberOfnodesArray = {1000, 5000, 10000};
 
-                for(int numberOfnodes: numberOfnodesArray){
-                    for(int numberOfLayersTopology = 10 ; numberOfLayersTopology >= 8 ; numberOfLayersTopology-- ){
+                for (int numberOfnodes : numberOfnodesArray) {
+                    for (int numberOfLayersTopology = 10; numberOfLayersTopology >= 8; numberOfLayersTopology--) {
 
                         Parameters.N_M = 10000;
 
-                        Parameters.NUMBER_OF_PARTIES = (int) Math.ceil(numberOfnodes/(Math.pow(2,numberOfLayersTopology) - 1));
+                        Parameters.NUMBER_OF_PARTIES = (int) Math.ceil(numberOfnodes / (Math.pow(2, numberOfLayersTopology) - 1));
 
                         OfflinePhaseSimulation offlinePhaseSimulationToMeasureReshare = new OfflinePhaseSimulation();
                         double time_before = offlinePhaseSimulationToMeasureReshare.getLastFinishingTimeForAllNodes();
@@ -459,7 +457,7 @@ public class CommunicationTreeSimulator {
                         offlinePhaseSimulationToMeasureReshare.doAllEvents();
                         double time_after = offlinePhaseSimulationToMeasureReshare.getLastFinishingTimeForAllNodes();
 
-                        Parameters.RESHARE_TIMES = (time_after - time_before) * (Parameters.getNumberOfParties() * Math.ceil(Parameters.N_M) *2);
+                        Parameters.RESHARE_TIMES = (time_after - time_before) * (Parameters.getNumberOfParties() * Math.ceil(Parameters.N_M) * 2);
 
                         /**
                          *start the experiment
@@ -467,7 +465,7 @@ public class CommunicationTreeSimulator {
 
                         float executionTime = simulateOfflinePhase();
 
-                        writer.println(numberOfnodes + " " + Parameters.NUMBER_OF_PARTIES  + " " + numberOfLayersTopology + " " + executionTime + " " + Parameters.RESHARE_TIMES );
+                        writer.println(numberOfnodes + " " + Parameters.NUMBER_OF_PARTIES + " " + numberOfLayersTopology + " " + executionTime + " " + Parameters.RESHARE_TIMES);
                     }
                 }
 
@@ -476,13 +474,10 @@ public class CommunicationTreeSimulator {
                 System.out.println("error occurred");
             }
 
-        }
+        } else if (expNumber == 3) {
 
-        else if(expNumber == 3)
-        {
-
-            int[] numberOfNodesArray = {1024,	2048,	4096,	8192,	16384,	32768,	65536,	131072,	262144,	524288,	1048576};
-            int[] numberOfLayersTopologyArray = { 8, 9, 10,	11,	12,	13,	14,	15,	16,	17, 18};
+            int[] numberOfNodesArray = {1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576};
+            int[] numberOfLayersTopologyArray = {8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
 
             float delay = 50;
             float dataSize = 1000;
@@ -490,7 +485,7 @@ public class CommunicationTreeSimulator {
 
             try {
                 PrintWriter writer = new PrintWriter("EXP3_network_128.txt", "UTF-8");
-                for(int i = 0 ; i < numberOfNodesArray.length ; i ++) {
+                for (int i = 0; i < numberOfNodesArray.length; i++) {
                     int numberOfnodes = numberOfNodesArray[i];
                     int numberOfLayersTopology = numberOfLayersTopologyArray[i];
                     searchForExecutionTime(writer, delay, bandWidth, dataSize, numberOfLayersTopology, numberOfnodes);
@@ -512,7 +507,7 @@ public class CommunicationTreeSimulator {
                 writer.println("Parameters.NUMBER_OF_PARTIES numberOfLayersTopology executionTime");
 
                 Parameters.N_M = 10000;
-                Parameters.NUMBER_OF_PARTIES = 6 ; //(int) Math.ceil(numberOfnodes/(Math.pow(2,numberOfLayersTopology) - 1));
+                Parameters.NUMBER_OF_PARTIES = 6; //(int) Math.ceil(numberOfnodes/(Math.pow(2,numberOfLayersTopology) - 1));
 
                 OfflinePhaseSimulation offlinePhaseSimulationToMeasureReshare = new OfflinePhaseSimulation();
                 double time_before = offlinePhaseSimulationToMeasureReshare.getLastFinishingTimeForAllNodes();
@@ -520,7 +515,7 @@ public class CommunicationTreeSimulator {
                 offlinePhaseSimulationToMeasureReshare.doAllEvents();
                 double time_after = offlinePhaseSimulationToMeasureReshare.getLastFinishingTimeForAllNodes();
 
-                Parameters.RESHARE_TIMES = (time_after - time_before) * (Parameters.getNumberOfParties() * Math.ceil(Parameters.N_M) *2);
+                Parameters.RESHARE_TIMES = (time_after - time_before) * (Parameters.getNumberOfParties() * Math.ceil(Parameters.N_M) * 2);
                 System.out.println("time for a reshare: " + Parameters.RESHARE_TIMES + " numberOfLayersTopology: " + Parameters.NUMBER_OF_PARTIES);
 
                 /**
@@ -535,8 +530,39 @@ public class CommunicationTreeSimulator {
                 System.out.println("error occurred");
             }
 
-        }
-        else if(expNumber == 4){
+//
+//
+//            try {
+//                PrintWriter writer = new PrintWriter("EXP3_offline_phase_original_SPDZ.txt", "UTF-8");
+//
+//                Parameters.count = 0;
+//                writer.println("Parameters.NUMBER_OF_PARTIES numberOfLayersTopology executionTime");
+//
+//                Parameters.N_M = 10000;
+//                Parameters.NUMBER_OF_PARTIES = 1024 ; //(int) Math.ceil(numberOfnodes/(Math.pow(2,numberOfLayersTopology) - 1));
+//
+//                OfflinePhaseSimulation offlinePhaseSimulationToMeasureReshare = new OfflinePhaseSimulation();
+//                double time_before = offlinePhaseSimulationToMeasureReshare.getLastFinishingTimeForAllNodes();
+//                offlinePhaseSimulationToMeasureReshare.schedule(new Reshare(offlinePhaseSimulationToMeasureReshare, 0, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+//                offlinePhaseSimulationToMeasureReshare.doAllEvents();
+//                double time_after = offlinePhaseSimulationToMeasureReshare.getLastFinishingTimeForAllNodes();
+//
+//                Parameters.RESHARE_TIMES = (time_after - time_before) * (Parameters.getNumberOfParties() * Math.ceil(Parameters.N_M) *2);
+//                System.out.println("time for a reshare: " + Parameters.RESHARE_TIMES + " numberOfLayersTopology: " + Parameters.NUMBER_OF_PARTIES);
+//
+//                /**
+//                 *start the experiment
+//                 */
+//
+//                float executionTime = simulateOfflinePhase();
+//
+//                writer.println("Parameters.NUMBER_OF_PARTIES:" + 8 + " executionTime: " + executionTime);
+//                writer.close();
+//            } catch (Exception e) {
+//                System.out.println("error occurred");
+//            }
+
+        } else if (expNumber == 4) {
 
 
             float DELAY_COM = 50;
@@ -546,9 +572,9 @@ public class CommunicationTreeSimulator {
                 PrintWriter writer = new PrintWriter("EXP4.txt", "UTF-8");
 
 
-                for(float N_SMALL= 10 ; N_SMALL < 100  ; N_SMALL += 10){
-                    for(float N_LARGE= 10 ; N_LARGE < 100  ; N_LARGE += 10){
-                        for(float DATA= 4 ; DATA < 40000  ; DATA *= 10) {
+                for (float N_SMALL = 10; N_SMALL < 100; N_SMALL += 10) {
+                    for (float N_LARGE = 10; N_LARGE < 100; N_LARGE += 10) {
+                        for (float DATA = 4; DATA < 40000; DATA *= 10) {
 
                             //from small to large;
                             float time_STOL = DELAY_COM + (DATA) / BW * N_LARGE;
@@ -569,9 +595,37 @@ public class CommunicationTreeSimulator {
 
                 }
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("error occurred");
             }
+        } else if (expNumber == 5) {
+            /**
+             * Measuer the time for running the online final cluster with various numbers!
+             */
+
+            try {
+                PrintWriter writer = new PrintWriter("EXP5_online_cluster_size.txt", "UTF-8");
+
+                writer.println("numberOfParties perClusterOnlineExecutionTime");
+                for (int numberOfParties = 20; numberOfParties <= 120; numberOfParties = numberOfParties + 20) {
+
+                    Parameters.NUMBER_OF_PARTIES = numberOfParties; //this is only for one cluster
+                    Parameters.N_M = 10000;
+                    Parameters.N_A = 10000;
+
+                    Parameters.RECEIVE_TIME = 1;
+
+                    float perClusterOnlineExecutionTime = runOnlinePhaseSim();
+                    writer.println(numberOfParties + " " + perClusterOnlineExecutionTime);
+
+                }
+
+                writer.close();
+            } catch (Exception e) {
+                System.out.println("error occured");
+            }
+
+
         }
 
 //

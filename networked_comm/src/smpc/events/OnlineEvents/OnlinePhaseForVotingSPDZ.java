@@ -32,14 +32,17 @@ public class OnlinePhaseForVotingSPDZ extends Event{
 			simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.ADDITION, Parameters.N_A));
 		}
 
-		for(int i = 0 ; i < Parameters.getNumberOfMultiplications() ; i++){
-			simulation.schedule(new Multiplication(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
-			simulation.doAllEvents() ;
-			System.out.println("multiplication done: " + i);
-		}
+		double before = simulation.getLastFinishingTimeForAllNodes();
+		simulation.schedule(new Multiplication(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties()));
+		simulation.doAllEvents() ;
+		double after = simulation.getLastFinishingTimeForAllNodes();
 
-		simulation.schedule(new MacCheck(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties(), Parameters.getNumberOfMultiplications()));
+		simulation.setAllFinishingTimes(simulation.getLastFinishingTimeForAllNodes() + (after - before)* Parameters.getNumberOfMultiplications());
+
+
 		System.out.println("MacCheck started");
+		simulation.schedule(new MacCheck(simulation, startTime, Parameters.VIRTUAL_HOST, 0, Parameters.getNumberOfParties(), Parameters.getNumberOfMultiplications()));
+		simulation.doAllEvents() ;
 		return false;
 	}
 

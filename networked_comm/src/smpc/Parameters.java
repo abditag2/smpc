@@ -34,7 +34,9 @@ public class Parameters {
 	static public int RANDOM_GEN_TIME  = 1;
 
 	static public int SHE_ENCRYPT_TIME = 10;
-	static public int SHE_DECRYPT_TIME = 10;
+	static public int SHE_DECRYPT_TIME = 3;
+	static public int SHE_ADD_TIME = 1;
+	static public int SHE_MULTIPLY_TIME = 11;
 
 	/**
 	 * AES genreation takes 10 ms per MByte of data.
@@ -106,6 +108,12 @@ public class Parameters {
 			case XOR:
 				duration = XOR_TIME;
 				break;
+			case SHE_ADD:
+				duration = SHE_ADD_TIME;
+				break;
+			case SHE_MULTIPLY:
+				duration = SHE_MULTIPLY_TIME;
+				break;
 		}
 
 		return (double) duration;
@@ -117,7 +125,6 @@ public class Parameters {
 		XOR,
 		MULITIPLICATION,
 		RANDOM_GEN,
-		COMMIT_COMPUTATION,
 		SHE_ENCRYPT,
 		SHE_DECRYPT,
 		SHE_MULTIPLY,

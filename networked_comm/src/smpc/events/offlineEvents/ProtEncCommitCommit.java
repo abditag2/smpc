@@ -54,7 +54,7 @@ public class ProtEncCommitCommit extends Event{
             }
         }
 
-
+        System.out.println("ProtCommitCommit2");
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i ++){
             simulation.schedule(new ProtCommitOpen(simulation, simulation.time, i, 0, Parameters.getNumberOfParties()));
         }
@@ -63,7 +63,7 @@ public class ProtEncCommitCommit extends Event{
         for (int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
             simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.ADDITION, 1));
         }
-
+        System.out.println("ProtCommitCommit3");
         return false;
     }
 }

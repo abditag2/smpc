@@ -123,10 +123,9 @@ public class offlinePhase extends Event {
             simulation.setAllFinishingTimes(simulation.getLastFinishingTimeForAllNodes() + Parameters.RESHARE_TIMES);
             simulation.setAllFinishingTimes(simulation.getLastFinishingTimeForAllNodes() + Parameters.RESHARE_TIMES);
             simulation.setAllFinishingTimes(simulation.getLastFinishingTimeForAllNodes() + Parameters.RESHARE_TIMES);
-            simulation.doAllEvents();
-
         }
 
+        simulation.doAllEvents();
 
             /**
              *
@@ -136,11 +135,17 @@ public class offlinePhase extends Event {
              run MacCheck!
              */
 
-            for(int k = 0 ; k < Parameters.N_M ; k++){
-                for(int j = 0 ; j < Parameters.getNumberOfParties() ; j++) {
-                    simulation.schedule(new BroadCast(simulation, simulation.time, j, 0, Parameters.getNumberOfParties()));
-                }
-            }
+            System.out.println("Final Broad Cast");
+
+        int numberOfBroadCasts = Parameters.N_M * Parameters.getNumberOfParties() ;
+
+        double before = simulation.getLastFinishingTimeForAllNodes();
+        simulation.schedule(new BroadCast(simulation, simulation.time, 0, 0, Parameters.getNumberOfParties()));
+        simulation.doAllEvents();
+        double after = simulation.getLastFinishingTimeForAllNodes();
+
+        System.out.println("time of last broadcasts: " + numberOfBroadCasts * (after - before) + " " + (after - before));
+        simulation.setAllFinishingTimes(simulation.getLastFinishingTimeForAllNodes() + numberOfBroadCasts * (after - before));
 
             return false;
         }

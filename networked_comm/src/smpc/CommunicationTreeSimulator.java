@@ -351,7 +351,7 @@ public class CommunicationTreeSimulator {
         boolean commTreeNetwork = true;
         boolean searchForMinimumRoundLength = true;
 
-        int expNumber = 5;
+        int expNumber = 6;
 
         if (expNumber == 1) {
 
@@ -607,7 +607,7 @@ public class CommunicationTreeSimulator {
                 PrintWriter writer = new PrintWriter("EXP5_online_cluster_size.txt", "UTF-8");
 
                 writer.println("numberOfParties perClusterOnlineExecutionTime");
-                for (int numberOfParties = 20; numberOfParties <= 120; numberOfParties = numberOfParties + 20) {
+                for (int numberOfParties = 5; numberOfParties <= 30; numberOfParties = numberOfParties + 3) {
 
                     Parameters.NUMBER_OF_PARTIES = numberOfParties; //this is only for one cluster
                     Parameters.N_M = 10000;
@@ -617,8 +617,38 @@ public class CommunicationTreeSimulator {
 
                     float perClusterOnlineExecutionTime = runOnlinePhaseSim();
                     writer.println(numberOfParties + " " + perClusterOnlineExecutionTime);
-
+                    writer.flush();
                 }
+
+                writer.close();
+            } catch (Exception e) {
+                System.out.println("error occured");
+            }
+
+
+        }
+        else if (expNumber == 6) {
+
+
+            try {
+                PrintWriter writer = new PrintWriter("EXP5_online_cluster_size.txt", "UTF-8");
+
+                writer.println("numberOfParties perClusterOnlineExecutionTime");
+//                for (int numberOfParties = 5; numberOfParties <= 30; numberOfParties = numberOfParties + 3) {
+
+                int numberOfParties = 40;
+
+                    Parameters.NUMBER_OF_PARTIES = numberOfParties; //this is only for one cluster
+                    Parameters.N_M = 10000;
+                    Parameters.N_A = 10000;
+
+                    Parameters.RECEIVE_TIME = 1;
+
+                    float perClusterOnlineExecutionTime = runOnlinePhaseSim();
+                    writer.println(numberOfParties + " " + perClusterOnlineExecutionTime);
+                System.out.println(numberOfParties + " " + perClusterOnlineExecutionTime);
+                    writer.flush();
+//                }
 
                 writer.close();
             } catch (Exception e) {

@@ -44,12 +44,15 @@ public class MacCheck extends Event {
                  Compute n additions
          */
 
+        System.out.println("MacCheck started");
 
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
             simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.RANDOM_GEN, 1));
             simulation.schedule(new ProtCommitCommit(simulation, simulation.time, i, 0, Parameters.getNumberOfParties()));
+            simulation.doAllEvents();
+            System.out.println("mcCheck 0."  + i);
         }
-
+        System.out.println("mcCheck 0");
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
             simulation.schedule(new ProtCommitOpen(simulation, simulation.time, i, 0, Parameters.getNumberOfParties()));
         }
@@ -58,7 +61,7 @@ public class MacCheck extends Event {
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
             simulation.schedule( new Computation(simulation, simulation.time, i, Parameters.ComputationType.XOR, Parameters.getNumberOfParties()));
         }
-
+        System.out.println("mcCheck 1");
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
             simulation.schedule( new Computation(simulation, simulation.time, i,
                     Parameters.ComputationType.RANDOM_GEN, Parameters.getNumberOfMultiplications()));
@@ -73,6 +76,7 @@ public class MacCheck extends Event {
 
         simulation.schedule(new ProtCommitCommit(simulation, simulation.time, 0, 0, Parameters.getNumberOfParties()));
 
+        System.out.println("mcCheck 2");
         for(int i = 0 ; i < Parameters.getNumberOfParties() ; i++){
             simulation.schedule(new ProtCommitOpen(simulation, simulation.time, i, 0, Parameters.getNumberOfParties()));
             simulation.schedule( new Computation(simulation, simulation.time, i,

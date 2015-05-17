@@ -1,5 +1,6 @@
 package smpc.events;
 
+import smpc.Parameters;
 import smpc.abstractlibrary.Event;
 import smpc.abstractlibrary.Simulation;
 import smpc.library.OnlinePhaseSimulation;
@@ -35,7 +36,7 @@ public class BroadCast extends Event {
 		{
 //			System.out.println("bc send time:" + time);
 			int destID = (i + hostID) % end;
-			Send sendEvent = new Send(simulation, time  , hostID, destID);
+			Send sendEvent = new Send(simulation, startTime + Parameters.RECEIVE_TIME*Parameters.getNumberOfParties(), hostID, destID);
 			simulation.schedule(sendEvent);
 			time = sendEvent.getFinishingTime();
 		}

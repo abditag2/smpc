@@ -1,0 +1,6 @@
+numberOfParties perClusterOnlineExecutionTime
+20 902733.0
+40 1306113.0
+60 1710293.0
+80 2115273.0
+100 2521053.0
